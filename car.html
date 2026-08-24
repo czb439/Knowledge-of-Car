@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>汽车构造详解 — 燃油车 · 新能源车 · 电动客车 完整图解</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --primary: #1a237e;
+    --primary-light: #3949ab;
+    --accent: #ff6f00;
+    --accent-light: #ffa726;
+    --bg: #f5f5f5;
+    --card-bg: #ffffff;
+    --text: #212121;
+    --text-light: #616161;
+    --border: #e0e0e0;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --radius: 12px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    background: linear-gradient(135deg, #0d1b4a 0%, #1a237e 40%, #283593 100%);
+    color: white;
+    padding: 60px 40px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 70%, rgba(255,111,0,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(57,73,171,0.15) 0%, transparent 50%);
+    animation: heroGlow 8s ease-in-out infinite alternate;
+  }
+  @keyframes heroGlow {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-2%, 2%); }
+  }
+  .hero h1 {
+    font-size: 3em;
+    font-weight: 800;
+    margin-bottom: 12px;
+    position: relative;
+    letter-spacing: 2px;
+  }
+  .hero p {
+    font-size: 1.15em;
+    opacity: 0.85;
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .hero .stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 30px;
+    position: relative;
+  }
+  .hero .stat {
+    text-align: center;
+  }
+  .hero .stat .num {
+    font-size: 2.2em;
+    font-weight: 800;
+    color: var(--accent-light);
+  }
+  .hero .stat .label {
+    font-size: 0.85em;
+    opacity: 0.7;
+  }
+
+  /* ===== NAV ===== */
+  .nav-container {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .nav {
+    display: flex;
+    overflow-x: auto;
+    padding: 0 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 18px;
+    text-decoration: none;
+    color: var(--text-light);
+    font-size: 0.9em;
+    font-weight: 500;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: all 0.25s;
+  }
+  .nav a:hover, .nav a.active {
+    color: var(--primary);
+    border-bottom-color: var(--accent);
+  }
+  .nav a .icon { font-size: 1.2em; }
+
+  /* ===== MAIN ===== */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 30px 20px 60px;
+  }
+
+  /* ===== SECTION ===== */
+  .section {
+    margin-bottom: 60px;
+    scroll-margin-top: 70px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-num {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1em;
+    flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-size: 1.7em;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .section-header .subtitle {
+    font-size: 0.9em;
+    color: var(--text-light);
+  }
+
+  /* ===== IMAGE CARD ===== */
+  .img-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .img-card img {
+    width: 100%;
+    display: block;
+    cursor: zoom-in;
+    transition: transform 0.3s;
+  }
+  .img-card .img-caption {
+    padding: 12px 20px;
+    background: #fafafa;
+    font-size: 0.85em;
+    color: var(--text-light);
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+
+  /* ===== CONTENT ===== */
+  .content-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+  .content-card h3 {
+    font-size: 1.2em;
+    color: var(--primary);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .content-card p {
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .content-card p:last-child { margin-bottom: 0; }
+
+  /* ===== PARTS GRID ===== */
+  .parts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .part-item {
+    background: #f8f9ff;
+    border-radius: 10px;
+    padding: 18px 20px;
+    border-left: 4px solid var(--primary-light);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+  .part-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(26,35,126,0.1);
+  }
+  .part-item .part-name {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 1em;
+    margin-bottom: 4px;
+  }
+  .part-item .part-name-en {
+    font-size: 0.8em;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .part-item .part-desc {
+    font-size: 0.88em;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-top: 6px;
+  }
+
+  /* ===== FLOW DIAGRAM ===== */
+  .flow-box {
+    background: linear-gradient(135deg, #e8eaf6, #f3e5f5);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+  .flow-box .flow-title {
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 10px;
+    font-size: 0.95em;
+  }
+  .flow-steps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .flow-step {
+    background: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--primary);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+  .flow-arrow {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 1.2em;
+  }
+
+  /* ===== TIP BOX ===== */
+  .tip-box {
+    background: #fff8e1;
+    border-left: 4px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 20px;
+    margin: 16px 0;
+  }
+  .tip-box .tip-title {
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .tip-box p {
+    font-size: 0.9em;
+    color: #5d4037;
+  }
+
+  /* ===== LIGHTBOX ===== */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    cursor: zoom-out;
+  }
+  .lightbox.active { display: flex; }
+  .lightbox img {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+  .lightbox .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 2em;
+    cursor: pointer;
+    background: rgba(255,255,255,0.1);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .lightbox .close-btn:hover { background: rgba(255,255,255,0.25); }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--text-light);
+    font-size: 0.85em;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 2em; }
+    .hero .stats { gap: 20px; }
+    .hero .stat .num { font-size: 1.6em; }
+    .content-card { padding: 20px; }
+    .parts-grid { grid-template-columns: 1fr; }
+    .section-header h2 { font-size: 1.3em; }
+  }
+
+  /* ===== SCROLL TO TOP ===== */
+  .scroll-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 48px;
+    height: 48px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.4em;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(26,35,126,0.3);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s;
+    z-index: 90;
+  }
+  .scroll-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .scroll-top:hover { background: var(--primary-light); }
+
+  /* ===== COLLAPSIBLE ===== */
+  .collapsible-header {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .collapsible-header::after {
+    content: '▼';
+    font-size: 0.7em;
+    transition: transform 0.3s;
+    color: var(--text-light);
+  }
+  .collapsible-header.collapsed::after {
+    transform: rotate(-90deg);
+  }
+  .collapsible-body {
+    max-height: 5000px;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+  .collapsible-body.collapsed {
+    max-height: 0;
+  }
+
+  /* ===== COMPARISON TABLE ===== */
+  .compare-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin: 20px 0;
+    font-size: 0.9em;
+  }
+  .compare-table th {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    padding: 14px 12px;
+    text-align: center;
+    font-weight: 600;
+  }
+  .compare-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    vertical-align: top;
+  }
+  .compare-table tr:nth-child(even) td { background: #f8f9ff; }
+  .compare-table tr:hover td { background: #e8eaf6; }
+  .compare-table td:first-child {
+    font-weight: 600;
+    text-align: left;
+    background: #fafafa;
+    color: var(--primary);
+    min-width: 100px;
+  }
+  .tag-ice { background: #fff3e0; color: #e65100; padding: 2px 8px; border-radius: 10px; font-size: 0.85em; font-weight: 600; }
+  .tag-bev { background: #e0f2f1; color: #00695c; padding: 2px 8px; border-radius: 10px; font-size: 0.85em; font-weight: 600; }
+  .tag-erev { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 10px; font-size: 0.85em; font-weight: 600; }
+  .tag-phev { background: #e3f2fd; color: #1565c0; padding: 2px 8px; border-radius: 10px; font-size: 0.85em; font-weight: 600; }
+  .tag-bus { background: #f3e5f5; color: #6a1b9a; padding: 2px 8px; border-radius: 10px; font-size: 0.85em; font-weight: 600; }
+  .section-badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.75em;
+    font-weight: 600;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+  .badge-bev { background: #e0f2f1; color: #00695c; }
+  .badge-erev { background: #e8f5e9; color: #2e7d32; }
+  .badge-phev { background: #e3f2fd; color: #1565c0; }
+  .badge-bus { background: #f3e5f5; color: #6a1b9a; }
+  .badge-compare { background: #fff3e0; color: #e65100; }
+
+
+  /* ===== TYPE TABS ===== */
+  .type-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 16px 8px;
+    background: white;
+    flex-wrap: wrap;
+  }
+  .type-tab {
+    padding: 8px 18px;
+    border: 2px solid var(--border);
+    border-radius: 24px;
+    background: white;
+    font-size: 0.88em;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .type-tab:hover {
+    border-color: var(--tab-color, var(--primary));
+    color: var(--tab-color, var(--primary));
+    background: color-mix(in srgb, var(--tab-color, var(--primary)) 6%, white);
+  }
+  .type-tab.active {
+    border-color: var(--tab-color, var(--primary));
+    background: var(--tab-color, var(--primary));
+    color: white;
+    box-shadow: 0 3px 12px color-mix(in srgb, var(--tab-color, var(--primary)) 30%, transparent);
+  }
+  .type-tab[data-filter="all"] { --tab-color: var(--primary); }
+  /* Section group headers */
+  .group-header {
+    display: none;
+    padding: 14px 20px;
+    margin: 30px 0 16px;
+    border-radius: var(--radius);
+    font-size: 1.15em;
+    font-weight: 700;
+  }
+  .group-header.visible { display: block; }
+  .group-header-ice { background: linear-gradient(135deg, #fff3e0, #ffe0b2); color: #e65100; }
+  .group-header-bev { background: linear-gradient(135deg, #e0f2f1, #b2dfdb); color: #00695c; }
+  .group-header-erev { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: #2e7d32; }
+  .group-header-phev { background: linear-gradient(135deg, #e3f2fd, #bbdefb); color: #1565c0; }
+  .group-header-compare { background: linear-gradient(135deg, #fff3e0, #ffcc80); color: #e65100; }
+  .group-header-bus { background: linear-gradient(135deg, #f3e5f5, #e1bee7); color: #6a1b9a; }
+  .group-header-mfg { background: linear-gradient(135deg, #eceff1, #cfd8dc); color: #37474f; }
+
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <h1>🚗 汽车构造详解</h1>
+  <div style="margin-top:8px;font-size:0.95em;opacity:0.75">燃油乘用车 · 纯电/增程/插混乘用车 · 纯电动客车</div>
+  <p>从发动机到轮胎，全面解析汽车的每一个核心系统。图文并茂，带你深入了解汽车的内部构造与工作原理。</p>
+  <div class="stats">
+    <div class="stat">
+      <div class="num">44</div>
+      <div class="label">核心专题</div>
+    </div>
+    <div class="stat">
+      <div class="num">235+</div>
+      <div class="label">关键零部件</div>
+    </div>
+    <div class="stat">
+      <div class="num">32</div>
+      <div class="label">高清图解</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NAV ===== -->
+<div class="nav-container">
+  <!-- 车型类型标签页 -->
+  <div class="type-tabs">
+    <button class="type-tab active" data-filter="all">🚗 全部</button>
+    <button class="type-tab" data-filter="ice" style="--tab-color:#e65100">⛽ 燃油乘用车</button>
+    <button class="type-tab" data-filter="bev" style="--tab-color:#00695c">🔋 纯电BEV</button>
+    <button class="type-tab" data-filter="erev" style="--tab-color:#2e7d32">🔌 增程EREV</button>
+    <button class="type-tab" data-filter="phev" style="--tab-color:#1565c0">⚡ 插混PHEV</button>
+    <button class="type-tab" data-filter="compare" style="--tab-color:#e65100">📊 动力对比</button>
+    <button class="type-tab" data-filter="bus" style="--tab-color:#6a1b9a">🚌 电动客车</button>
+    <button class="type-tab" data-filter="mfg" style="--tab-color:#37474f">🏭 制造工艺</button>
+  </div>
+  <!-- 系统子导航 -->
+  <nav class="nav" id="mainNav">
+    <a href="#overview" data-type="ice"><span class="icon">🔍</span>总览</a>
+    <a href="#engine" data-type="ice"><span class="icon">⚙️</span>发动机</a>
+    <a href="#transmission" data-type="ice"><span class="icon">🔗</span>传动系统</a>
+    <a href="#chassis" data-type="ice"><span class="icon">🏗️</span>底盘悬架</a>
+    <a href="#brake" data-type="ice"><span class="icon">🛑</span>制动系统</a>
+    <a href="#steering" data-type="ice"><span class="icon">🎯</span>转向系统</a>
+    <a href="#cooling" data-type="ice"><span class="icon">❄️</span>冷却系统</a>
+    <a href="#fuel" data-type="ice"><span class="icon">⛽</span>燃油系统</a>
+    <a href="#exhaust" data-type="ice"><span class="icon">💨</span>排气系统</a>
+    <a href="#electrical" data-type="ice"><span class="icon">⚡</span>电气系统</a>
+    <a href="#body" data-type="ice"><span class="icon">🚘</span>车身结构</a>
+    <a href="#wheel" data-type="ice"><span class="icon">🛞</span>车轮轮胎</a>
+    <a href="#interior" data-type="ice"><span class="icon">🪑</span>内饰仪表</a>
+    <a href="#bev-overview" data-type="bev"><span class="icon">🔋</span>三电总览</a>
+    <a href="#bev-battery" data-type="bev"><span class="icon">🔋</span>动力电池</a>
+    <a href="#bev-motor" data-type="bev"><span class="icon">⚡</span>电驱动</a>
+    <a href="#bev-brake" data-type="bev"><span class="icon">🛑</span>制动回收</a>
+    <a href="#bev-thermal" data-type="bev"><span class="icon">❄️</span>热管理</a>
+    <a href="#bev-charge" data-type="bev"><span class="icon">🔌</span>充电系统</a>
+    <a href="#bev-chassis" data-type="bev"><span class="icon">🚘</span>底盘车身</a>
+    <a href="#erev-overview" data-type="erev"><span class="icon">🔌</span>架构总览</a>
+    <a href="#erev-extender" data-type="erev"><span class="icon">⚙️</span>增程器系统</a>
+    <a href="#erev-motor" data-type="erev"><span class="icon">⚡</span>电驱动</a>
+    <a href="#erev-thermal" data-type="erev"><span class="icon">❄️</span>热管理</a>
+    <a href="#erev-chassis" data-type="erev"><span class="icon">🚘</span>制动底盘</a>
+    <a href="#phev-overview" data-type="phev"><span class="icon">⚡</span>架构总览</a>
+    <a href="#phev-dht" data-type="phev"><span class="icon">🔩</span>DHT变速箱</a>
+    <a href="#phev-engine" data-type="phev"><span class="icon">⚙️</span>发动机</a>
+    <a href="#phev-battery" data-type="phev"><span class="icon">🔋</span>电池电驱</a>
+    <a href="#phev-brake" data-type="phev"><span class="icon">🛑</span>制动系统</a>
+    <a href="#phev-other" data-type="phev"><span class="icon">❄️</span>热管理底盘</a>
+    <a href="#compare" data-type="compare"><span class="icon">📊</span>四种动力对比</a>
+    <a href="#ebus-overview" data-type="bus"><span class="icon">🚌</span>总体特征</a>
+    <a href="#ebus-battery" data-type="bus"><span class="icon">🔋</span>动力电池</a>
+    <a href="#ebus-motor" data-type="bus"><span class="icon">⚡</span>电驱动</a>
+    <a href="#ebus-brake" data-type="bus"><span class="icon">🛑</span>气压制动</a>
+    <a href="#ebus-suspension" data-type="bus"><span class="icon">🏗️</span>空气悬架</a>
+    <a href="#ebus-electrical" data-type="bus"><span class="icon">⚡</span>高压电气</a>
+    <a href="#ebus-charge" data-type="bus"><span class="icon">🔌</span>充电系统</a>
+    <a href="#mfg-overview" data-type="mfg"><span class="icon">🏭</span>四大工艺总览</a>
+    <a href="#mfg-stamping" data-type="mfg"><span class="icon">🔨</span>冲压工艺</a>
+    <a href="#mfg-welding" data-type="mfg"><span class="icon">🤖</span>焊装工艺</a>
+    <a href="#mfg-painting" data-type="mfg"><span class="icon">🎨</span>涂装工艺</a>
+    <a href="#mfg-assembly" data-type="mfg"><span class="icon">🔧</span>总装工艺</a>
+  </nav>
+</div>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+
+<!-- ==================== 1. 总览 ==================== -->
+<div class="group-header group-header-ice" data-type="ice">⛽ 燃油乘用车</div>
+<section class="section" id="overview" data-type="ice">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <div>
+      <h2>汽车总体构造概览</h2>
+      <div class="subtitle">Vehicle Overview — 汽车的四大组成部分</div>
+    </div>
+  </div>
+
+  <div class="img-card">
+    <img src="images/overview-car-structure.jpg" alt="汽车总体构造爆炸图" loading="lazy">
+    <div class="img-caption">汽车总体构造爆炸图 — 点击可放大查看各部件名称</div>
+  </div>
+
+  <div class="content-card">
+    <h3>🚗 汽车由四大核心部分组成</h3>
+    <p>一辆现代汽车大约由 <strong>30,000 个零部件</strong> 组成，这些零件协同工作，构成了一个复杂的机械系统。从宏观角度看，汽车可以划分为四大核心部分：</p>
+    <div class="parts-grid">
+      <div class="part-item">
+        <div class="part-name">发动机（Engine）</div>
+        <div class="part-name-en">动力源 — 汽车的"心脏"</div>
+        <div class="part-desc">将燃料的化学能转化为机械能，为汽车提供驱动力。现代汽车主要使用汽油发动机和柴油发动机，新能源车则使用电动机。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">底盘（Chassis）</div>
+        <div class="part-name-en">骨架与行走机构</div>
+        <div class="part-desc">承载车身和所有机械部件的结构框架，包含传动系统、行驶系统（悬架/车轮）、转向系统和制动系统。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">车身（Body）</div>
+        <div class="part-name-en">外壳与乘员舱</div>
+        <div class="part-desc">为驾驶员和乘客提供安全舒适的空间，同时起到空气动力学和碰撞保护作用。现代车身多为承载式（unibody）结构。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">电气设备（Electrical）</div>
+        <div class="part-name-en">神经系统</div>
+        <div class="part-desc">包括启动系统、充电系统、照明系统、信号系统、仪表系统以及日益复杂的电子控制单元（ECU）和车载网络。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-title">💡 小知识</div>
+    <p>世界上第一辆实用的汽车由德国工程师卡尔·本茨（Karl Benz）于1886年发明，那是一辆三轮汽车，搭载了一台单缸四冲程汽油发动机。如今130多年过去了，汽车已从简单的机械装置演变为高度集成的机电一体化产品。</p>
+  </div>
+</section>
+
+<!-- ==================== 2. 发动机 ==================== -->
+<section class="section" id="engine" data-type="ice">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <div>
+      <h2>发动机</h2>
+      <div class="subtitle">Engine — 汽车的心脏与动力源</div>
+    </div>
+  </div>
+
+  <div class="img-card">
+    <img src="images/ice-engine.jpg" alt="发动机剖面图" loading="lazy">
+    <div class="img-caption">四冲程内燃机剖面图 — 展示气缸、活塞、曲轴等核心部件</div>
+  </div>
+
+  <div class="content-card">
+    <h3>⚙️ 发动机工作原理</h3>
+    <p>内燃机（Internal Combustion Engine, ICE）是大多数传统汽车的动力来源。它通过燃料在气缸内燃烧产生高温高压气体，推动活塞做往复运动，再通过连杆-曲轴机构将直线运动转化为旋转运动，最终输出扭矩驱动车轮。</p>
+    <p>现代汽车最常见的是<strong>四冲程发动机</strong>，每个工作循环包含四个行程：</p>
+    <div class="flow-box">
+      <div class="flow-title">四冲程工作循环（Otto Cycle）</div>
+      <div class="flow-steps">
+        <span class="flow-step">① 进气 Intake</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">② 压缩 Compression</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">③ 做功 Power</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">④ 排气 Exhaust</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <h3>🔩 发动机核心零部件</h3>
+    <div class="parts-grid">
+      <div class="part-item">
+        <div class="part-name">气缸体 Cylinder Block</div>
+        <div class="part-desc">发动机的主体结构，内部有圆柱形的气缸孔，活塞在其中往复运动。通常由铸铁或铝合金铸造，是整个发动机的基础支撑件。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">气缸盖 Cylinder Head</div>
+        <div class="part-desc">安装在气缸体顶部，封闭气缸上部形成燃烧室。内部包含进排气道、气门座、火花塞安装孔和凸轮轴轴承座。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">活塞 Piston</div>
+        <div class="part-desc">在气缸内做上下往复运动的圆柱形金属件。顶部承受燃烧压力，通过活塞环密封气缸壁，底部通过活塞销与连杆相连。通常由铝合金制成。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">连杆 Connecting Rod</div>
+        <div class="part-desc">连接活塞与曲轴的杆件，将活塞的直线往复运动转化为曲轴的旋转运动。承受巨大的交变载荷，通常由锻钢制造。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">曲轴 Crankshaft</div>
+        <div class="part-desc">将各缸活塞的往复运动汇总为连续旋转运动的核心轴。曲轴上的偏心曲柄销与连杆大端相连，旋转时输出扭矩至飞轮和变速箱。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">凸轮轴 Camshaft</div>
+        <div class="part-desc">控制气门开闭时刻和升程的旋转轴。轴上有精确加工的凸轮凸起，随轴旋转推动气门按时序开启。现代发动机多采用顶置双凸轮轴（DOHC）设计。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">气门 Valve</div>
+        <div class="part-desc">控制进气和排气的"开关"。进气门允许新鲜空气/混合气进入气缸，排气门让燃烧后的废气排出。每个气缸通常有2-4个气门。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">火花塞 Spark Plug</div>
+        <div class="part-desc">在压缩行程末端产生电火花，点燃压缩后的空气-燃油混合气。中心电极与侧电极之间的间隙通常为0.7-1.1mm，放电电压可达数万伏。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">正时链条/皮带 Timing Chain/Belt</div>
+        <div class="part-desc">连接曲轴和凸轮轴，确保气门开闭与活塞运动精确同步。正时链条寿命长但噪音较大，正时皮带安静但需定期更换。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">油底壳 Oil Pan/Sump</div>
+        <div class="part-desc">位于发动机底部的储油容器，收集和存储润滑机油。机油泵从油底壳吸取机油，经过滤后输送到发动机各运动部件进行润滑和冷却。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-title">💡 发动机类型对比</div>
+    <p><strong>直列（Inline/L）：</strong>气缸排成一列，结构简单，常见于4缸以下。<br>
+    <strong>V型（V-type）：</strong>气缸分成两列呈V形，长度短、重心低，常见于6缸及以上。<br>
+    <strong>水平对置（Boxer/H）：</strong>气缸水平对置，重心最低、运转最平顺，保时捷和斯巴鲁的标志性设计。<br>
+    <strong>涡轮增压（Turbo）：</strong>利用废气驱动涡轮压缩进气，小排量也能输出大功率，是当下的主流趋势。</p>
+  </div>
+</section>
+
+<!-- ==================== 3. 传动系统 ==================== -->
+<section class="section" id="transmission" data-type="ice">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <div>
+      <h2>传动系统</h2>
+      <div class="subtitle">Transmission & Drivetrain — 动力的传递与变速</div>
+    </div>
+  </div>
+
+  <div class="img-card">
+    <img src="images/ice-transmission.jpg" alt="传动系统剖面图" loading="lazy">
+    <div class="img-caption">变速箱与传动系统 — 从发动机到车轮的动力传递路径</div>
+  </div>
+
+  <div class="content-card">
+    <h3>🔗 传动系统的作用</h3>
+    <p>传动系统负责将发动机输出的动力（扭矩和转速）传递给驱动轮，同时实现变速变矩、倒车和空挡等功能。发动机在高转速小扭矩时效率最高，但车轮需要低转速大扭矩来起步和爬坡——变速箱正是解决这个矛盾的关键。</p>
+    <div class="flow-box">
+      <div class="flow-title">动力传递路径</div>
+      <div class="flow-steps">
+        <span class="flow-step">发动机</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">离合器/变矩器</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">变速箱</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">传动轴</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">差速器</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">半轴/CV节</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">驱动轮</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <h3>🔩 传动系统核心零部件</h3>
+    <div class="parts-grid">
+      <div class="part-item">
+        <div class="part-name">离合器 Clutch（手动挡）</div>
+        <div class="part-desc">位于发动机飞轮和变速箱之间，通过摩擦片的接合与分离来传递或切断动力。踩下离合踏板时分离，松开时接合。驾驶员可控制半联动状态实现平稳起步。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">液力变矩器 Torque Converter（自动挡）</div>
+        <div class="part-desc">替代离合器的液压耦合装置，通过传动油液传递动力。内部的泵轮、涡轮和导轮配合，不仅能自动传递动力，还能放大扭矩（变矩），使起步更加平顺。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">变速箱 Gearbox/Transmission</div>
+        <div class="part-desc">通过不同齿比的齿轮组合，实现变速变矩。低挡位（1、2挡）齿比大、扭矩大、速度慢，适合起步爬坡；高挡位（5、6挡）齿比小、扭矩小、速度快，适合高速巡航。自动变速箱（AT/CVT/DCT）能自动选择合适挡位。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">传动轴 Drive Shaft</div>
+        <div class="part-desc">在后驱和四驱车中，传动轴将变速箱输出的动力传递到后桥差速器。它是一根长管状轴，两端有万向节（U-joint）以适应悬架的上下运动。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">差速器 Differential</div>
+        <div class="part-desc">允许左右驱动轮以不同转速旋转的齿轮装置。转弯时外侧轮需要转更多圈，差速器通过行星齿轮机构自动补偿转速差，避免轮胎磨损和驱动桥损坏。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">半轴/CV节 Half Shaft / CV Joint</div>
+        <div class="part-desc">半轴将差速器的动力传递到车轮。CV（Constant Velocity，等速万向节）允许半轴在转向和悬架跳动时仍保持等速传递动力。前驱车每个前轮有一根半轴和内外两个CV节。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-title">💡 驱动形式对比</div>
+    <p><strong>前驱（FF）：</strong>发动机和驱动轮都在前方，结构紧凑、成本低、空间利用率高，大多数家用车采用。<br>
+    <strong>后驱（FR）：</strong>发动机前置、后轮驱动，前后重量分配好、操控性强，豪华车和运动车偏爱。<br>
+    <strong>四驱（4WD/AWD）：</strong>四个车轮都有驱动力，抓地力强，适合越野和湿滑路面，但油耗和重量更高。</p>
+  </div>
+</section>
+
+<!-- ==================== 4. 底盘悬架 ==================== -->
+<section class="section" id="chassis" data-type="ice">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <div>
+      <h2>底盘与悬架系统</h2>
+      <div class="subtitle">Chassis & Suspension — 承载与舒适性的基石</div>
+    </div>
+  </div>
+
+  <div class="img-card">
+    <img src="images/ice-chassis-suspension.jpg" alt="底盘悬架系统" loading="lazy">
+    <div class="img-caption">承载式车身底盘与悬架系统 — 弹簧、减震器、控制臂一览</div>
+  </div>
+
+  <div class="content-card">
+    <h3>🏗️ 底盘结构类型</h3>
+    <p>底盘是汽车的骨架，承载所有机械部件和乘员。现代汽车主要有两种底盘结构：</p>
+    <p><strong>承载式车身（Unibody）：</strong>车身外壳和底盘框架融为一体，由冲压钢板焊接而成的整体结构。重量轻、重心低、碰撞安全性好，是绝大多数轿车和城市SUV的选择。</p>
+    <p><strong>非承载式车身（Body-on-Frame）：</strong>车身安装在独立的梯形或箱型车架上。承载能力强、越野性能好，常见于皮卡、硬派越野车和商用车。</p>
+  </div>
+
+  <div class="content-card">
+    <h3>🔩 悬架系统核心零部件</h3>
+    <div class="parts-grid">
+      <div class="part-item">
+        <div class="part-name">螺旋弹簧 Coil Spring</div>
+        <div class="part-desc">悬架的弹性元件，吸收路面冲击能量。当车轮碾过凸起时弹簧被压缩，过凹坑时弹簧伸长，使车身保持相对平稳。弹簧刚度直接影响乘坐舒适性和操控稳定性。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">减震器 Shock Absorber / Damper</div>
+        <div class="part-desc">控制弹簧振动的液压装置。弹簧吸收冲击后会反复弹跳，减震器通过内部油液流经阀门产生阻尼力，快速抑制弹簧的多余振动，让车轮尽快贴回路面。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">麦弗逊支柱 MacPherson Strut</div>
+        <div class="part-desc">将弹簧和减震器集成在一起的悬架单元，结构紧凑、成本低。支柱顶部连接车身塔顶，底部连接转向节。是前悬架最常见的设计形式。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">控制臂 Control Arm</div>
+        <div class="part-desc">连接车身和车轮的摆臂，允许车轮上下跳动同时控制车轮定位角度。下控制臂（Lower Arm）最为常见，高端车采用多连杆（Multi-link）设计以获得更好的操控性。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">稳定杆 Stabilizer Bar / Anti-roll Bar</div>
+        <div class="part-desc">横向连接左右悬架的扭力杆。转弯时车身侧倾，稳定杆通过扭转抵抗左右高度差，减小侧倾幅度，提高弯道稳定性。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">球头 Ball Joint</div>
+        <div class="part-desc">控制臂与转向节之间的球形铰接点，允许多方向自由转动。类似人体关节的功能，使悬架能上下运动同时保持转向能力。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">副车架 Subframe</div>
+        <div class="part-desc">安装在车身底部的辅助框架，用于固定发动机、变速箱和悬架组件。能有效隔离振动传递到车身，也便于生产线上的模块化装配。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">衬套 Bushing</div>
+        <div class="part-desc">安装在悬架连接处的橡胶或聚氨酯弹性垫，起到缓冲振动、减少噪音和允许微小位移的作用。老化后会导致异响和操控松散感。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 5. 制动系统 ==================== -->
+<section class="section" id="brake" data-type="ice">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <div>
+      <h2>制动系统</h2>
+      <div class="subtitle">Braking System — 安全减速与停车的保障</div>
+    </div>
+  </div>
+
+  <div class="img-card">
+    <img src="images/ice-brake-system.jpg" alt="制动系统图解" loading="lazy">
+    <div class="img-caption">制动系统组件 — 碟刹与鼓刹的结构对比</div>
+  </div>
+
+  <div class="content-card">
+    <h3>🛑 制动系统工作原理</h3>
+    <p>制动系统的核心原理是<strong>摩擦制动</strong>：将车辆的动能通过摩擦转化为热能散发到空气中。踩下制动踏板时，制动液在密闭管路中传递压力（帕斯卡原理），推动制动卡钳或制动蹄压紧旋转的制动盘/鼓，产生摩擦力矩使车辆减速。</p>
+    <p>现代汽车普遍采用<strong>液压制动</strong>系统，前轮使用制动力更大的<strong>盘式制动（Disc Brake）</strong>，后轮根据车型配置使用盘式或<strong>鼓式制动（Drum Brake）</strong>。</p>
+  </div>
+
+  <div class="content-card">
+    <h3>🔩 制动系统核心零部件</h3>
+    <div class="parts-grid">
+      <div class="part-item">
+        <div class="part-name">制动踏板 Brake Pedal</div>
+        <div class="part-desc">驾驶员踩下的踏板，是制动操作的起点。通过杠杆比放大力度，传递到制动主缸。踏板行程和脚感是制动系统健康状况的重要指标。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">真空助力器 Brake Booster</div>
+        <div class="part-desc">安装在踏板和主缸之间的真空助力装置。利用发动机进气歧管的真空（或电动真空泵）放大踩踏力，使驾驶员只需较小的力就能产生足够的制动压力。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">制动主缸 Master Cylinder</div>
+        <div class="part-desc">将踏板的机械力转化为液压力的核心部件。内部活塞推动制动液，通过管路分配到四个车轮的制动分缸。现代主缸采用双回路设计，一路失效另一路仍能工作。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">制动盘 Brake Disc/Rotor</div>
+        <div class="part-desc">与车轮同速旋转的铸铁圆盘。制动时卡钳夹紧盘面两侧产生摩擦力。通风盘（Vented Disc）内部有散热筋片，能更好地散热，常用于前轮和高性能车。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">制动卡钳 Brake Caliper</div>
+        <div class="part-desc">跨骑在制动盘上的C形夹具，内部有活塞。液压推动活塞，使两侧的刹车片夹紧制动盘。浮动式卡钳（单活塞）成本低，固定式卡钳（多活塞）制动力更均匀。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">刹车片 Brake Pad</div>
+        <div class="part-desc">贴在制动盘两侧的摩擦材料，直接与盘面摩擦产生制动力。属于消耗品，厚度低于3mm时需更换。摩擦材料配方直接影响制动效能、噪音和粉尘。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">ABS防抱死系统</div>
+        <div class="part-desc">Anti-lock Braking System，通过轮速传感器监测车轮是否抱死。紧急制动时自动调节各轮制动力，防止车轮锁死，保持转向能力和方向稳定性。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">制动液 Brake Fluid</div>
+        <div class="part-desc">传递制动压力的液压介质。常用DOT4或DOT5.1规格，具有高沸点（防气阻）和低凝点的特性。会吸湿劣化，建议每2年更换一次。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-title">⚠️ 制动系统养护提示</div>
+    <p>刹车片厚度低于3mm应立即更换；制动盘出现深沟槽或厚度不均需光盘或更换；制动液含水率超过3%必须更换（可用检测笔测试）；如果制动时方向盘抖动，通常是前制动盘变形。制动系统关乎生命安全，建议每10,000km检查一次。</p>
+  </div>
+</section>
+
+<!-- ==================== 6. 转向系统 ==================== -->
+<section class="section" id="steering" data-type="ice">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <div>
+      <h2>转向系统</h2>
+      <div class="subtitle">Steering System — 精准控制行驶方向</div>
+    </div>
+  </div>
+
+  <div class="img-card">
+    <img src="images/ice-steering.jpg" alt="转向系统图解" loading="lazy">
+    <div class="img-caption">齿轮齿条式转向系统 — 从方向盘到车轮的完整传动链路</div>
+  </div>
+
+  <div class="content-card">
+    <h3>🎯 转向系统工作原理</h3>
+    <p>转向系统的作用是将驾驶员转动方向盘的动作传递到前轮（有时也包括后轮），改变车辆行驶方向。转动方向盘时，转向柱将旋转运动传递到转向机，转向机将旋转运动转化为横向的推拉运动，通过拉杆推动转向节使车轮偏转。</p>
+    <p>现代汽车几乎全部配备<strong>助力转向</strong>系统，大幅减小转向所需的力量。主流类型包括：液压助力转向（HPS）、电子液压助力转向（EHPS）和电动助力转向（EPS/EPAS），其中EPS因节能和可编程性已成为绝对主流。</p>
+  </div>
+
+  <div class="content-card">
+    <h3>🔩 转向系统核心零部件</h3>
+    <div class="parts-grid">
+      <div class="part-item">
+        <div class="part-name">方向盘 Steering Wheel</div>
+        <div class="part-desc">驾驶员操作转向的输入装置。现代方向盘集成安全气囊、多功能按键（音量/巡航/电话）和换挡拨片。转向圈数通常为2.5-3.5圈（锁到锁）。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">转向柱 Steering Column</div>
+        <div class="part-desc">连接方向盘和转向机的管状轴。带有可溃缩设计（碰撞时自动缩短以保护驾驶员），高端车型配备电动调节（上下/伸缩）和记忆功能。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">转向机（齿轮齿条）Rack & Pinion</div>
+        <div class="part-desc">最常见的转向机构。小齿轮（Pinion）与转向柱相连，与齿条（Rack）啮合。转动方向盘时，小齿轮转动推动齿条左右移动，实现转向。齿比决定了转向的灵敏度和力度。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">横拉杆 Tie Rod</div>
+        <div class="part-desc">连接转向机齿条和转向节的杆件，将齿条的横向运动传递到车轮。分为内拉杆和外拉杆，外拉杆端头为球铰结构。拉杆长度可调，用于调整前束角（Toe Angle）。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">转向节 Steering Knuckle</div>
+        <div class="part-desc">车轮安装处的枢纽零件，同时连接悬架（控制臂/支柱）和转向拉杆。转向拉杆推动转向节绕主销轴线偏转，带动车轮改变方向。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">电动助力电机 EPS Motor</div>
+        <div class="part-desc">电动助力转向系统的伺服电机，根据车速和转向扭矩传感器信号，由ECU计算并输出适当的辅助力矩。低速时助力大（方便停车），高速时助力小（保证路感）。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 7. 冷却系统 ==================== -->
+<section class="section" id="cooling" data-type="ice">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <div>
+      <h2>冷却系统</h2>
+      <div class="subtitle">Cooling System — 维持发动机最佳工作温度</div>
+    </div>
+  </div>
+
+  <div class="img-card">
+    <img src="images/ice-cooling.jpg" alt="冷却系统图解" loading="lazy">
+    <div class="img-caption">发动机冷却液循环路径 — 蓝色为冷液、红色为热液</div>
+  </div>
+
+  <div class="content-card">
+    <h3>❄️ 冷却系统工作原理</h3>
+    <p>发动机燃烧温度可达 2000°C 以上，但金属部件和机油的工作温度上限只有约 100-110°C。冷却系统的任务就是持续带走多余热量，让发动机维持在 <strong>85-105°C</strong> 的最佳温度区间。</p>
+    <p>现代汽车采用<strong>强制循环水冷系统</strong>：水泵驱动冷却液在发动机水套和散热器之间循环，冷却液吸收发动机热量后流经散热器，由风扇和行驶风冷却后再次循环。</p>
+    <div class="flow-box">
+      <div class="flow-title">冷却液循环路径</div>
+      <div class="flow-steps">
+        <span class="flow-step">水泵</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">发动机水套</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">节温器</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">散热器</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">回水管</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">水泵</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <h3>🔩 冷却系统核心零部件</h3>
+    <div class="parts-grid">
+      <div class="part-item">
+        <div class="part-name">散热器 Radiator</div>
+        <div class="part-desc">位于车头的热交换器，由铝制芯体和塑料水室组成。冷却液流经密集的散热翅片管，空气从翅片间流过带走热量。散热器前方通常还有空调冷凝器。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">水泵 Water Pump</div>
+        <div class="part-desc">驱动冷却液循环的离心泵。通常由正时皮带/链条带动，叶轮旋转产生离心力推动冷却液流动。水泵泄漏（密封件老化）是常见故障。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">节温器 Thermostat</div>
+        <div class="part-desc">控制冷却液流向的温度阀门。冷启动时关闭到散热器的通路（小循环），让发动机快速升温；达到工作温度后打开（大循环），防止过热。内部是石蜡感温元件。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">冷却风扇 Cooling Fan</div>
+        <div class="part-desc">低速行驶或怠速时提供强制通风。现代车多用电驱动风扇（ECU根据水温控制转速），老式车用发动机带动的硅油离合器风扇。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">膨胀水箱 Expansion Tank</div>
+        <div class="part-desc">冷却系统的溢流/补液容器。冷却液受热膨胀时流入此罐，冷却后回流系统。保持系统压力稳定，也方便检查液位。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">暖风水箱 Heater Core</div>
+        <div class="part-desc">位于仪表台内部的小型散热器，利用热冷却液为车内提供暖风。冬季开暖风不需要启动A/C压缩机，热量来自发动机余热，几乎不增加油耗。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 8. 燃油系统 ==================== -->
+<section class="section" id="fuel" data-type="ice">
+  <div class="section-header">
+    <div class="section-num">8</div>
+    <div>
+      <h2>燃油系统</h2>
+      <div class="subtitle">Fuel System — 燃料的储存、输送与喷射</div>
+    </div>
+  </div>
+
+  <div class="img-card">
+    <img src="images/ice-fuel.jpg" alt="燃油系统图解" loading="lazy">
+    <div class="img-caption">燃油供给系统 — 从油箱到喷油嘴的完整燃油路径</div>
+  </div>
+
+  <div class="content-card">
+    <h3>⛽ 燃油系统工作原理</h3>
+    <p>燃油系统负责将汽油或柴油从油箱输送到发动机气缸内，以精确的量和时机进行喷射。现代汽车普遍采用<strong>电子燃油喷射（EFI）</strong>系统，由ECU根据各传感器信号精确控制喷油量和喷油时刻，取代了老式的化油器。</p>
+    <p>直喷发动机（GDI/FSI/TSI）将喷油嘴直接安装在气缸内，燃油以极高压力（可达 200-350 bar）直接喷入燃烧室，实现更精确的控制和更高的燃烧效率。</p>
+  </div>
+
+  <div class="content-card">
+    <h3>🔩 燃油系统核心零部件</h3>
+    <div class="parts-grid">
+      <div class="part-item">
+        <div class="part-name">油箱 Fuel Tank</div>
+        <div class="part-desc">储存燃油的密封容器，通常位于车辆后部底盘下方。现代油箱多用高密度聚乙烯（HDPE）塑料制成，耐腐蚀、重量轻。容量一般40-70升，内部有隔板防止燃油晃动。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">燃油泵 Fuel Pump</div>
+        <div class="part-desc">安装在油箱内部的电动泵，将燃油加压后输送到发动机。通常与油位传感器和滤网集成在一起（燃油泵总成）。工作压力约3-5 bar（歧管喷射）或更高。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">燃油滤清器 Fuel Filter</div>
+        <div class="part-desc">过滤燃油中的杂质、水分和颗粒物，保护喷油嘴和高压油泵。通常安装在油箱出口管路上，建议每4-6万公里更换。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">燃油油轨 Fuel Rail</div>
+        <div class="part-desc">安装在发动机上方的分配管路，将高压燃油均匀分配到各缸喷油嘴。内部维持恒定压力，配有油压调节器。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">喷油嘴 Fuel Injector</div>
+        <div class="part-desc">电磁控制的精密阀门，接收ECU信号后在精确时刻开启，将雾化燃油喷入进气道（歧管喷射）或气缸内（直喷）。喷油脉宽（开启时间）通常为1-20毫秒。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">碳罐 Evaporative Canister</div>
+        <div class="part-desc">内含活性炭的密封罐，吸附油箱中挥发的燃油蒸汽，防止排入大气。发动机运转时，进气真空将蒸汽吸入气缸燃烧。这是排放控制系统的重要组成部分。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 9. 排气系统 ==================== -->
+<section class="section" id="exhaust" data-type="ice">
+  <div class="section-header">
+    <div class="section-num">9</div>
+    <div>
+      <h2>排气系统</h2>
+      <div class="subtitle">Exhaust System — 废气处理与噪音控制</div>
+    </div>
+  </div>
+
+  <div class="img-card">
+    <img src="images/ice-exhaust.jpg" alt="排气系统图解" loading="lazy">
+    <div class="img-caption">排气系统全貌 — 从排气歧管到尾管的废气处理路径</div>
+  </div>
+
+  <div class="content-card">
+    <h3>💨 排气系统的作用</h3>
+    <p>排气系统承担三项核心任务：<strong>收集并排出废气</strong>（将各缸燃烧后的废气汇集并引至车尾排放）、<strong>净化有害气体</strong>（通过催化转化器将CO、HC、NOx转化为无害的CO₂、H₂O和N₂）、<strong>降低排气噪音</strong>（通过消声器衰减排气脉冲产生的噪音）。</p>
+    <div class="flow-box">
+      <div class="flow-title">废气排放路径</div>
+      <div class="flow-steps">
+        <span class="flow-step">排气歧管</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">氧传感器</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">三元催化器</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">中间管</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">消声器</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">尾管</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <h3>🔩 排气系统核心零部件</h3>
+    <div class="parts-grid">
+      <div class="part-item">
+        <div class="part-name">排气歧管 Exhaust Manifold</div>
+        <div class="part-desc">直接连接发动机气缸盖的铸铁或不锈钢管路，将各缸排出的高温废气（约800°C）汇集到一条管道。性能车使用等长排气歧管（Headers）以优化排气脉冲。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">三元催化器 Catalytic Converter</div>
+        <div class="part-desc">内部装有铂、钯、铑等贵金属催化剂的蜂窝陶瓷载体。在400°C以上工作，将一氧化碳（CO）氧化为CO₂、碳氢化合物（HC）氧化为H₂O+CO₂、氮氧化物（NOx）还原为N₂。是排放控制的核心部件。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">氧传感器 O₂ Sensor / Lambda Sensor</div>
+        <div class="part-desc">安装在排气管中检测废气含氧量，信号反馈给ECU用于实时调节空燃比（闭环控制）。催化器前后各有一个，前者控制空燃比，后者监测催化器效率。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">消声器 Muffler / Silencer</div>
+        <div class="part-desc">通过内部隔板、穿孔管和吸音材料衰减排气噪音。反射式消声器利用声波干涉抵消噪音，吸收式使用玻璃棉吸收声能。性能车的运动排气通常减少消声以追求声浪。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">谐振器 Resonator</div>
+        <div class="part-desc">位于催化器和消声器之间的辅助消声装置，专门消除特定频率的排气噪音（嗡嗡声）。部分车型没有此部件。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">EGR废气再循环阀</div>
+        <div class="part-desc">Exhaust Gas Recirculation，将部分废气引回进气道重新参与燃烧，降低燃烧温度从而减少NOx排放。柴油车的EGR系统尤为重要。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 10. 电气系统 ==================== -->
+<section class="section" id="electrical" data-type="ice">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div>
+      <h2>电气系统</h2>
+      <div class="subtitle">Electrical System — 汽车的"神经系统"</div>
+    </div>
+  </div>
+
+  <div class="img-card">
+    <img src="images/ice-electrical.jpg" alt="电气系统图解" loading="lazy">
+    <div class="img-caption">汽车电气系统布局 — 蓄电池、发电机、ECU等主要电气设备</div>
+  </div>
+
+  <div class="content-card">
+    <h3>⚡ 电气系统概述</h3>
+    <p>现代汽车的电气系统越来越复杂，从最初的点火和照明发展为涵盖发动机管理、安全系统、信息娱乐、驾驶辅助等数十个子系统的庞大网络。汽车的电气架构正在从传统的12V向48V轻混和高压混动/纯电平台演进。</p>
+    <p>电气系统的核心是<strong>"发电—储电—用电"</strong>循环：发动机带动发电机发电，电能储存在蓄电池中，各用电设备从电池/发电机获取电力。</p>
+  </div>
+
+  <div class="content-card">
+    <h3>🔩 电气系统核心零部件</h3>
+    <div class="parts-grid">
+      <div class="part-item">
+        <div class="part-name">蓄电池 Battery</div>
+        <div class="part-desc">存储电能的12V铅酸电池（新能源车多用锂电池）。发动机熄火时为全车供电，启动时为大电流放电（CCA冷启动电流可达数百安培）。寿命通常3-5年。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">发电机 Alternator</div>
+        <div class="part-desc">由发动机皮带带动的交流发电机，通过整流器输出直流电。发动机运转时为全车供电并为蓄电池充电，输出电压约13.5-14.5V。功率通常在120-200A。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">起动机 Starter Motor</div>
+        <div class="part-desc">高扭矩直流电动机，启动时将齿轮啮合飞轮齿圈，带动发动机曲轴旋转至点火成功。瞬间电流可达200-600A，是车上最大瞬时用电设备。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">ECU 发动机控制单元</div>
+        <div class="part-desc">Engine Control Unit，汽车的"大脑"。根据各传感器信号（进气量/氧含量/水温/转速/油门开度等），实时计算并控制喷油量、点火时刻、气门正时等参数，确保最佳性能和排放。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">保险丝盒 Fuse Box</div>
+        <div class="part-desc">集中安装各电路保险丝和继电器的配电箱。通常有两个：发动机舱内（管动力/照明电路）和仪表台侧面（管室内电路）。保险丝熔断保护线路免受过流损坏。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">CAN总线 CAN Bus</div>
+        <div class="part-desc">Controller Area Network，汽车内部各ECU之间的高速通讯网络。类似计算机的局域网，让发动机ECU、变速箱ECU、ABS、气囊等模块能相互通讯协调。速率可达500kbps。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">传感器群 Sensors</div>
+        <div class="part-desc">遍布车辆各处的电子"感官"：曲轴/凸轮轴位置传感器、进气压力/流量传感器、氧传感器、水温传感器、爆震传感器、轮速传感器、加速度传感器等，为ECU提供实时数据。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">照明系统 Lighting</div>
+        <div class="part-desc">包括前大灯（卤素/氙气/LED/激光）、尾灯、转向灯、雾灯、日行灯、室内灯等。现代趋势是LED和矩阵式大灯，能自动调节光形避免对向来车眩目。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 11. 车身结构 ==================== -->
+<section class="section" id="body" data-type="ice">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div>
+      <h2>车身结构</h2>
+      <div class="subtitle">Body Structure — 外形、空气动力学与碰撞安全</div>
+    </div>
+  </div>
+
+  <div class="img-card">
+    <img src="images/ice-body-structure.jpg" alt="车身结构图解" loading="lazy">
+    <div class="img-caption">车身钣金字部件名称 — 引擎盖、翼子板、保险杠、A/B/C柱等</div>
+  </div>
+
+  <div class="content-card">
+    <h3>🚘 车身结构与材料</h3>
+    <p>车身不仅是汽车的外观造型，更是保护乘员安全的"堡垒"。现代车身设计融合了<strong>空气动力学</strong>（降低风阻Cd值，减少风噪和油耗）、<strong>碰撞安全</strong>（吸能区+高强度乘员舱）和<strong>轻量化</strong>（提高燃油经济性和操控性）三大目标。</p>
+    <p>车身材料正从传统的低碳钢向<strong>高强度钢（HSS/UHSS）</strong>、<strong>铝合金</strong>、<strong>碳纤维复合材料</strong>和<strong>工程塑料</strong>等多元方向发展。高端车型已经实现全铝车身（如捷豹、奥迪A8）。</p>
+  </div>
+
+  <div class="content-card">
+    <h3>🔩 车身主要部件</h3>
+    <div class="parts-grid">
+      <div class="part-item">
+        <div class="part-name">引擎盖 Hood / Bonnet</div>
+        <div class="part-desc">覆盖发动机舱的可开启盖板，方便维修保养。内板通常有隔音隔热棉。部分车型引擎盖下方还设计有行人保护缓冲结构。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">翼子板 Fender</div>
+        <div class="part-desc">覆盖车轮上方的弧形钣金字，防止轮胎飞溅泥水。前翼子板位于前轮上方，后翼子板（Quarter Panel）通常与车身一体成型。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">保险杠 Bumper</div>
+        <div class="part-desc">车辆前后端的吸能结构。外层是塑料蒙皮，内部是泡沫缓冲材料和钢/铝防撞梁。低速碰撞（<15km/h）时保护车身主体不受损。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">A/B/C柱 Pillars</div>
+        <div class="part-desc">车身的垂直/倾斜支撑柱。A柱在挡风玻璃两侧（最重要的高强度件），B柱在前后门之间（侧面碰撞保护），C柱在后侧窗后方（轿车）。它们构成乘员舱的安全笼结构。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">车顶 Roof</div>
+        <div class="part-desc">覆盖乘员舱顶部的结构件。内部有横梁加强以承受翻车时的压力。可配置天窗（普通/全景）或敞篷机构。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">车门 Door</div>
+        <div class="part-desc">由外板、内板、防撞梁、车窗升降机构和密封条组成。内部防撞梁（Door Beam）是侧面碰撞的关键保护结构。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">行李箱盖 Trunk / Tailgate</div>
+        <div class="part-desc">轿车的行李箱盖或SUV的尾门，提供储物空间的开口。SUV/掀背车的尾门通常配有液压撑杆和电动开闭功能。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">挡风玻璃 Windshield</div>
+        <div class="part-desc">夹层安全玻璃（两层玻璃中间夹PVB薄膜），破碎时碎片粘附在薄膜上不会飞散。同时是车身结构的一部分，贡献约30%的车顶抗压强度。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 12. 车轮轮胎 ==================== -->
+<section class="section" id="wheel" data-type="ice">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div>
+      <h2>车轮与轮胎</h2>
+      <div class="subtitle">Wheels & Tires — 唯一与地面接触的部件</div>
+    </div>
+  </div>
+
+  <div class="img-card">
+    <img src="images/ice-wheel-tire.jpg" alt="车轮轮胎剖面图" loading="lazy">
+    <div class="img-caption">车轮与轮胎剖面构造 — 胎面、帘布层、轮辋、轮毂等</div>
+  </div>
+
+  <div class="content-card">
+    <h3>🛞 轮胎是唯一接触地面的部件</h3>
+    <p>轮胎是汽车与路面之间唯一的连接点——四个轮胎的接地面积加起来大约只有<strong>四张明信片</strong>大小，却要承担加速、制动、转向和承重全部任务。轮胎的状态直接决定了车辆的抓地力、操控性和安全性。</p>
+    <p>轮胎规格通常标注在胎侧，如 <strong>225/45R17</strong> 表示：胎宽225mm、扁平比45%（胎壁高度=225×45%=101mm）、R=子午线结构、17英寸轮辋直径。</p>
+  </div>
+
+  <div class="content-card">
+    <h3>🔩 车轮与轮胎核心零部件</h3>
+    <div class="parts-grid">
+      <div class="part-item">
+        <div class="part-name">胎面 Tread</div>
+        <div class="part-desc">轮胎最外层的橡胶花纹面，直接与路面接触。花纹设计影响抓地力、排水性、噪音和耐磨性。新胎花纹深度约8mm，低于1.6mm（磨损标记）必须更换。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">胎侧 Sidewall</div>
+        <div class="part-desc">轮胎侧面的柔性橡胶层，承受反复弯曲变形。印有轮胎规格、品牌、生产日期等信息。胎侧鼓包（帘线断裂）是严重安全隐患，必须立即更换。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">帘布层 Carcass / Plies</div>
+        <div class="part-desc">轮胎内部的骨架结构，由聚酯或尼龙帘线编织而成。子午线轮胎（Radial）的帘线方向与胎面中心线呈90°角，提供更好的舒适性和高速稳定性。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">钢丝带束层 Steel Belt</div>
+        <div class="part-desc">胎面下方的钢丝编织层，增强胎面刚性、提高抗刺穿能力和高速稳定性。通常有两层交叉排列。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">胎圈 Bead</div>
+        <div class="part-desc">轮胎内侧与轮辋配合的钢丝环，确保轮胎牢固安装在轮辋上并保持气密性。安装不当会导致漏气或脱圈。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">轮辋/轮毂 Rim / Wheel</div>
+        <div class="part-desc">轮胎安装的金属圆盘。钢制轮辋成本低、强度高但较重；铝合金轮毂更轻、散热更好、造型美观。尺寸以英寸表示（如17"、18"、19"）。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">轮毂轴承 Wheel Bearing</div>
+        <div class="part-desc">安装在轮毂中心，允许车轮顺畅旋转的精密轴承。磨损后会产生嗡嗡异响（随车速增大），严重时导致车轮晃动。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">胎压监测 TPMS</div>
+        <div class="part-desc">Tire Pressure Monitoring System，实时监测各轮胎气压并在气压过低时报警。直接式TPMS在气门嘴处安装压力传感器，间接式通过ABS轮速信号推算。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-title">💡 轮胎养护小贴士</div>
+    <p>每月检查一次胎压（标准值贴在驾驶员侧门框上，通常2.2-2.5bar）；每10,000km做一次轮胎换位（前后交叉对调）以均匀磨损；轮胎使用超过5年即使花纹足够也建议更换（橡胶老化）；四轮定位偏差会导致轮胎偏磨和跑偏。</p>
+  </div>
+</section>
+
+<!-- ==================== 13. 内饰仪表 ==================== -->
+<section class="section" id="interior" data-type="ice">
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <div>
+      <h2>内饰与仪表</h2>
+      <div class="subtitle">Interior & Dashboard — 驾驶舱的人机交互界面</div>
+    </div>
+  </div>
+
+  <div class="img-card">
+    <img src="images/ice-interior-dashboard.jpg" alt="内饰仪表图解" loading="lazy">
+    <div class="img-caption">驾驶舱全景 — 仪表盘、方向盘、中控屏、踏板等操作界面</div>
+  </div>
+
+  <div class="content-card">
+    <h3>🪑 驾驶舱的人机工程学</h3>
+    <p>驾驶舱是驾驶员与汽车交互的核心空间，设计需要兼顾信息获取的直观性、操作的便利性和乘坐的舒适性。现代驾驶舱正在从传统的物理按键和机械仪表向<strong>全液晶仪表</strong>、<strong>大尺寸触控屏</strong>和<strong>语音交互</strong>方向演进。</p>
+  </div>
+
+  <div class="content-card">
+    <h3>🔩 内饰仪表核心部件</h3>
+    <div class="parts-grid">
+      <div class="part-item">
+        <div class="part-name">仪表盘 Instrument Cluster</div>
+        <div class="part-desc">驾驶员正前方的信息显示区域。传统仪表包含车速表、转速表、燃油表和水温表。现代车多用全液晶仪表，可自定义显示导航、驾驶辅助等丰富信息。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">中控台 Center Console</div>
+        <div class="part-desc">仪表台中央区域，集成信息娱乐屏幕、空调控制面板、储物空间和换挡杆。现代趋势是大尺寸竖向触控屏整合了导航、音乐、车辆设置等功能。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">换挡杆 Gear Shifter</div>
+        <div class="part-desc">操控变速箱挡位的操纵杆。传统为机械式挡杆，新车型越来越多使用电子挡杆（旋钮/拨杆/按键式），仅发送电信号给变速箱。方向盘后方的换挡拨片也属于此类。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">踏板组 Pedals</div>
+        <div class="part-desc">手动挡三个踏板（从左到右：离合器、制动、油门），自动挡两个（制动、油门）。油门踏板为电子油门（Drive-by-Wire），踩下角度转换为电信号控制节气门开度。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">安全气囊 Airbag</div>
+        <div class="part-desc">碰撞时瞬间充气（约30毫秒）的保护气袋。标配包含前排双气囊+侧气囊+侧气帘（共6个），高端车型可达8-12个。配合安全带使用可减少约50%的严重伤害风险。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">空调系统 HVAC</div>
+        <div class="part-desc">Heating, Ventilation and Air Conditioning。压缩机由发动机皮带带动（或电动压缩机），制冷时压缩冷媒循环；制热时利用发动机冷却液余热。自动空调可根据设定温度自动调节风量和出风温度。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">后视镜 Rearview Mirror</div>
+        <div class="part-desc">车内中央后视镜和车外两侧后视镜。现代配置包括：自动防眩目、电动折叠/加热、盲区监测警示灯、倒车自动下翻等。部分新车用摄像头+车内屏幕取代传统后视镜。</div>
+      </div>
+      <div class="part-item">
+        <div class="part-name">座椅 Seat</div>
+        <div class="part-desc">由骨架、海绵、面料和调节机构组成。功能越来越丰富：电动多向调节、加热/通风/按摩、记忆功能、腰部支撑调节等。面料从织物到仿皮到Nappa真皮不等。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==================== 14. 纯电动乘用车 BEV ==================== -->
+<div class="group-header group-header-bev" data-type="bev">🔋 纯电动乘用车（BEV）</div>
+<section class="section" id="bev-overview" data-type="bev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##00695c,##00897b);font-size:0.85em">🔋</div>
+    <div><h2 style="font-size:1.3em">三电总览</h2><div class="subtitle">BEV · 纯电驱动架构全景</div></div>
+  </div>
+<div class="img-card"><img src="images/bev-overview.jpg" alt="纯电乘用车"三电系统"总成 — 动力电池 · 电驱动 · 电控"><div class="img-caption">纯电乘用车"三电系统"总成 — 动力电池 · 电驱动 · 电控</div></div>
+<div class="content-card"><h3>🔋 纯电的核心架构差异</h3><p>纯电动汽车彻底取消了发动机、变速箱、排气和燃油系统，取而代之的是<strong>动力电池+驱动电机+电控系统</strong>的"三电"核心架构。最大结构特征是<strong>滑板底盘（Skateboard Platform）</strong>：电池包平铺底盘下方，前后各布置驱动电机，中间完全平整。</p><p>相比燃油车，BEV零部件减少约<strong>40-50%</strong>（无发动机内部上千运动件），但电池包占整车成本30-40%、重量25-35%。</p>
+    <div class="flow-box"><div class="flow-title">纯电驱动能量流</div><div class="flow-steps"><span class="flow-step">动力电池</span><span class="flow-arrow">→</span> <span class="flow-step">逆变器/电控</span><span class="flow-arrow">→</span> <span class="flow-step">驱动电机</span><span class="flow-arrow">→</span> <span class="flow-step">减速器</span><span class="flow-arrow">→</span> <span class="flow-step">半轴</span><span class="flow-arrow">→</span><span class="flow-step">车轮</span></div></div></div>
+</section>
+<section class="section" id="bev-battery" data-type="bev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##00695c,##00897b);font-size:0.85em">🔋</div>
+    <div><h2 style="font-size:1.3em">动力电池</h2><div class="subtitle">BEV · 电能的储存与释放</div></div>
+  </div>
+<div class="img-card"><img src="images/bev-battery.jpg" alt="动力电池包内部结构 — 电芯→模组→电池包三级架构"><div class="img-caption">动力电池包内部结构 — 电芯→模组→电池包三级架构</div></div>
+<div class="content-card"><h3>🔋 动力电池系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">电芯 Cell</div><div class="part-desc">电池最小储能单元。主流形态：圆柱（18650/21700/4680）、方形铝壳（CATL/BYD）、软包（LG/SK）。正极分三元锂（NCM/NCA，能量密度高）和磷酸铁锂（LFP，安全长寿）。单体电压3.2-3.7V，容量50-300Ah。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">电池模组 Module</div><div class="part-desc">数十到数百电芯串并联组成。集成模组级BMS从板、温度传感器、保险丝和结构框架。部分车型采用CTP技术跳过模组直接集成到包。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">电池包 Battery Pack</div><div class="part-desc">模组+箱体+液冷系统+高压配电+BMS主板+热失控防护。密封IP67/IP68。电压平台400V或800V（小鹏G9/保时捷Taycan/极氪001）。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">电池管理系统 BMS</div><div class="part-desc">实时监测每个电芯电压/温度/内阻，执行均衡充电，控制充放电功率边界。主从架构：主板在包外，从板分布在各模组。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">液冷板/液冷管</div><div class="part-desc">紧贴模组底部的铝制流道板，冷却液（乙二醇水溶液）流经带走热量。夏季散热防热失控，冬季加热保低温充电安全。温差控制±2°C以内。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">高压连接器/MSD</div><div class="part-desc">电池包与外部高压系统接口。MSD手动维修断开装置，拔出即物理断开高压回路。连接器需满足IP67防水和振动耐久。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">电池包壳体/下护板</div><div class="part-desc">高强度铝挤压型材或钢制箱体。底部加装锰钢或铝合金护板，部分车型满足"针刺不起火"安全标准。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">热失控防护系统</div><div class="part-desc">气凝胶隔热垫+排气通道+灭火装置。国标GB 38031-2020要求热失控后5分钟内不起火不爆炸。</div></div>
+</div></div>
+</section>
+<section class="section" id="bev-motor" data-type="bev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##00695c,##00897b);font-size:0.85em">⚡</div>
+    <div><h2 style="font-size:1.3em">电驱动</h2><div class="subtitle">BEV · 电能转化为驱动力</div></div>
+  </div>
+<div class="img-card"><img src="images/bev-motor.jpg" alt="永磁同步驱动电机剖面 — 定子/转子/逆变器/减速器一体化"><div class="img-caption">永磁同步驱动电机剖面 — 定子/转子/逆变器/减速器一体化</div></div>
+<div class="content-card"><h3>⚡ 电驱动系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">永磁同步电机 PMSM</div><div class="part-desc">主流驱动电机。转子嵌稀土永磁体，定子三相绕组。效率峰值>96%，功率80-400kW，扭矩200-700Nm。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">感应电机 IM</div><div class="part-desc">特斯拉Model S/X后电机采用。无永磁体，高速效率优于PMSM。适合做辅助驱动电机（四驱副驱动桥）。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">定子 Stator</div><div class="part-desc">硅钢片叠压铁芯+三相铜线绕组。通入变频交流电产生旋转磁场。油冷电机效率更高。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">转子 Rotor</div><div class="part-desc">PMSM转子内嵌V型或一字型永磁体。旋变传感器实时检测位置，精度0.1°。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">逆变器 Inverter</div><div class="part-desc">将电池DC（400/800V）转换为三相AC。核心功率半导体：IGBT（成本较低）或碳化硅SiC（800V平台标配）。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">减速器 Reduction Gear</div><div class="part-desc">单级减速（齿比8-10:1），将高转速低扭矩转化为车轮需要的低转速高扭矩。因电机转速0-15000rpm，单级即可覆盖全速域。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">差速器 Differential</div><div class="part-desc">集成在减速器壳体内，允许左右半轴转速不同。尺寸比燃油车小。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">旋变传感器 Resolver</div><div class="part-desc">电机轴端精确检测转子位置角度（0.1°精度），逆变器据此控制三相电流相位。</div></div>
+</div></div>
+</section>
+<section class="section" id="bev-brake" data-type="bev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##00695c,##00897b);font-size:0.85em">🛑</div>
+    <div><h2 style="font-size:1.3em">制动回收</h2><div class="subtitle">BEV · 能量回收 + 机械制动协调</div></div>
+  </div>
+<div class="img-card"><img src="images/bev-brake-regen.jpg" alt="纯电制动系统 — 电子助力 + 能量回收协调制动"><div class="img-caption">纯电制动系统 — 电子助力 + 能量回收协调制动</div></div>
+<div class="content-card"><h3>🛑 制动系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">电子制动助力器 iBooster/eBooster</div><div class="part-desc">电动助力替代真空助力。电机驱动推杆产生液压，响应<150ms。优先用电机回收制动，不足时叠加液压制动。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">ESC/ESP液压模块</div><div class="part-desc">集成ABS/TCS/ESC。负责"制动混合"：根据踏板深度和车速自动分配电制动和液压制动比例。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">制动盘/卡钳</div><div class="part-desc">与燃油车相同的液压盘式制动，作为紧急制动和驻车制动保障。因能量回收分担大部分日常制动，刹车片寿命达燃油车2-3倍。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">能量回收制动 Regen</div><div class="part-desc">减速时电机反转发电，将动能转化为电能回充电池。回收约20-30%制动能量。强回收可实现"单踏板驾驶"。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">制动踏板行程传感器</div><div class="part-desc">检测踩踏深度和速度，信号给ESC/VCU判断制动意图（轻刹→纯回收/中刹→回收+液压/急刹→全液压+ABS）。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">EPB电子驻车</div><div class="part-desc">电机驱动后轮卡钳驻车。支持Auto Hold自动驻车功能。</div></div>
+</div></div>
+</section>
+<section class="section" id="bev-thermal" data-type="bev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##00695c,##00897b);font-size:0.85em">❄️</div>
+    <div><h2 style="font-size:1.3em">热管理</h2><div class="subtitle">BEV · 电池/电机/座舱一体化温控</div></div>
+  </div>
+<div class="img-card"><img src="images/bev-thermal.jpg" alt="热泵热管理系统 — 电池/电机/座舱一体化温控"><div class="img-caption">热泵热管理系统 — 电池/电机/座舱一体化温控</div></div>
+<div class="content-card"><h3>❄️ 热管理系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">热泵空调系统</div><div class="part-desc">利用制冷剂逆卡诺循环从外界"搬运"热量。COP制热2-4（1kW电产2-4kW热），比PTC节能60-70%。冬季续航提升15-25%。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">电动压缩机</div><div class="part-desc">高压电机驱动涡旋压缩机，功率3-8kW。替代皮带驱动，可独立于车速运行。变频按需调节。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">四通换向阀</div><div class="part-desc">切换制冷剂流向实现制冷/制热模式切换。制冷时冷凝器在车头，制热时反向。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">PTC电加热器</div><div class="part-desc">正温度系数陶瓷加热元件。COP=1，作为热泵补充，极寒（<-20°C）热泵效率下降时启动。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">电池液冷/液热回路</div><div class="part-desc">独立回路。冷却液通过底部液冷板循环。夏季走chiller降温，冬季走PTC水加热器升温。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">电机/电控冷却回路</div><div class="part-desc">第三条回路，通过车头低温散热器散热。工作温度60-85°C。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">电子水泵</div><div class="part-desc">12V或高压无刷直流泵，2-3个分别服务电池/电驱/充电回路。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">多通阀/八通阀</div><div class="part-desc">集成式阀组（如特斯拉Octovalve），减少管路接头和泄漏风险。</div></div>
+</div></div>
+</section>
+<section class="section" id="bev-charge" data-type="bev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##00695c,##00897b);font-size:0.85em">🔌</div>
+    <div><h2 style="font-size:1.3em">充电系统</h2><div class="subtitle">BEV · 交流慢充与直流快充</div></div>
+  </div>
+<div class="content-card"><h3>🔌 充电系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">交流慢充口（Type 2/GB/T）</div><div class="part-desc">7针接口，通过OBC将交流电转为直流。功率6.6-11kW，充满60kWh需6-10小时。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">直流快充口（CCS/GB/T）</div><div class="part-desc">9针大电流接口，绕过OBC直接输出DC。功率60-250kW，30分钟充10%-80%。800V平台支持480kW超充。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">车载充电机 OBC</div><div class="part-desc">220/380V AC整流升压为400/800V DC。效率>95%。双向OBC支持V2L对外放电和V2G反向送电。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">充电控制导引电路</div><div class="part-desc">充电口与桩之间握手协议。CP/PP信号确认连接状态、协商充电电流电压。国标GB/T 18487。</div></div>
+</div></div>
+</section>
+<section class="section" id="bev-chassis" data-type="bev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##00695c,##00897b);font-size:0.85em">🚘</div>
+    <div><h2 style="font-size:1.3em">底盘车身</h2><div class="subtitle">BEV · 与燃油车的异同</div></div>
+  </div>
+<div class="content-card"><h3>🚘 底盘/悬架/转向/车身差异</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">滑板底盘平台</div><div class="part-desc">电池包作为结构件集成到底盘中央，完全平整地板。前后悬置模块化安装。空间利用率比同级燃油车高10-15%。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">悬架（加强型）</div><div class="part-desc">因电池增加500-800kg，弹簧刚度和减震器阻尼加大。前悬多用双叉臂，后悬多连杆。可选空气悬架。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">电动助力转向 EPS</div><div class="part-desc">与燃油车EPS原理相同，增加能量回收联动。部分车型支持后轮转向（≤10°）。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">车身结构</div><div class="part-desc">无发动机舱碰撞吸能变化，前舱可做更短溃缩区+更硬乘员舱。前备箱（Frunk）是纯电标志空间优势。</div></div>
+<div class="part-item" style="border-left-color:#00897b"><div class="part-name" style="color:#00897b">隔音降噪 NVH</div><div class="part-desc">无发动机噪音后，路噪/风噪/电机啸叫成主噪声源。加强隔音棉+双层夹胶玻璃+电机隔音罩。低速AVAS行人警示音为法规要求。</div></div>
+</div></div>
+<div class="tip-box"><div class="tip-title">💡 纯电车的核心优势与局限</div><p>优势：零排放、加速迅猛（瞬时最大扭矩）、使用成本极低（约0.1元/km）、保养简单、智能化程度高。局限：充电时间长（快充30分钟 vs 加油5分钟）、冬季续航衰减20-40%、高速续航打折。</p></div>
+</section>
+<div class="group-header group-header-erev" data-type="erev">🔌 增程式电动车（EREV）</div>
+<section class="section" id="erev-overview" data-type="erev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##2e7d32,##43a047);font-size:0.85em">🔌</div>
+    <div><h2 style="font-size:1.3em">架构总览</h2><div class="subtitle">EREV · 串联混动，发动机只发电</div></div>
+  </div>
+<div class="content-card"><h3>🔌 增程式核心架构</h3><p>增程式电动车本质是<strong>"自带发电厂的纯电车"</strong>。发动机（增程器）完全不参与驱动车轮，唯一任务是带动发电机发电。车轮始终由电机驱动，驾驶感受与纯电一致。</p>
+    <div class="flow-box"><div class="flow-title">增程式能量流</div><div class="flow-steps"><span class="flow-step">油箱</span><span class="flow-arrow">→</span> <span class="flow-step">增程器发动机</span><span class="flow-arrow">→</span> <span class="flow-step">发电机</span><span class="flow-arrow">→</span> <span class="flow-step">功率分配器</span><span class="flow-arrow">→</span> <span class="flow-step">动力电池</span><span class="flow-arrow">→</span> <span class="flow-step">逆变器</span><span class="flow-arrow">→</span> <span class="flow-step">驱动电机</span><span class="flow-arrow">→</span> <span class="flow-step">减速器</span><span class="flow-arrow">→</span><span class="flow-step">车轮</span></div></div>
+    <p>代表车型：理想L系列、问界M5/M7/M9增程版、深蓝SL03/S7增程版。</p></div>
+</section>
+<section class="section" id="erev-extender" data-type="erev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##2e7d32,##43a047);font-size:0.85em">⚙️</div>
+    <div><h2 style="font-size:1.3em">增程器系统</h2><div class="subtitle">EREV · 专用发电发动机</div></div>
+  </div>
+<div class="img-card"><img src="images/erev-range-extender.jpg" alt="增程器总成剖面 — 小型发动机+发电机组一体化"><div class="img-caption">增程器总成剖面 — 小型发动机+发电机组一体化</div></div>
+<div class="content-card"><h3>⚙️ 增程器系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">增程器发动机</div><div class="part-desc">专用小排量涡轮增压1.2L-1.5L。无需全工况动力性，仅在2000-3000rpm最佳经济区间运行。阿特金森/米勒循环，热效率40%+。代表：理想1.5T、问界1.5T。</div></div>
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">发电机组 Generator</div><div class="part-desc">与曲轴直连的永磁同步发电机，功率50-100kW。发出三相AC经整流供给驱动电机或充入电池。发电效率>95%。</div></div>
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">进气系统</div><div class="part-desc">因舱内布局紧凑（无变速箱），进气道更短更直。电子节气门精确控制进气量维持恒转速发电。</div></div>
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">排气消声系统</div><div class="part-desc">NVH是核心难点。排气管路多级消声器+谐振腔，配合主动悬置抵消振动，增程器介入时车内几乎无感。</div></div>
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">发动机悬置（液压/主动式）</div><div class="part-desc">4点悬置固定增程器。液压悬置吸收低频振动，主动悬置电磁阀实时调节刚度。</div></div>
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">机油润滑系统</div><div class="part-desc">与燃油车相同的压力润滑。因转速恒定工况单一，机油劣化慢，保养间隔可延至15000-20000km。</div></div>
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">冷却系统（增程器专用）</div><div class="part-desc">独立冷却回路：散热器+电子水泵+节温器。余热可回收用于电池预热或座舱暖风。</div></div>
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">油箱与燃油供给</div><div class="part-desc">45-65L，电动燃油泵。因仅发电，油耗比同尺寸燃油车低30-50%。92号即可。</div></div>
+</div></div>
+</section>
+<section class="section" id="erev-motor" data-type="erev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##2e7d32,##43a047);font-size:0.85em">⚡</div>
+    <div><h2 style="font-size:1.3em">电驱动</h2><div class="subtitle">EREV · 与纯电BEV基本相同</div></div>
+  </div>
+<div class="content-card"><h3>⚡ 电驱动系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">驱动电机</div><div class="part-desc">与BEV相同永磁同步电机，功率130-250kW。四驱前后各一台。</div></div>
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">逆变器</div><div class="part-desc">电池DC→电机AC。IGBT/SiC模块。</div></div>
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">减速器</div><div class="part-desc">单级减速齿轮，齿比8-10:1。</div></div>
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">动力电池</div><div class="part-desc">30-45kWh，磷酸铁锂或三元锂。纯电续航150-250km。</div></div>
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">功率分配器</div><div class="part-desc">管理发电机输出、电池充放电和电机用电之间的平衡。优先直接供给电机减少损耗。</div></div>
+</div></div>
+</section>
+<section class="section" id="erev-thermal" data-type="erev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##2e7d32,##43a047);font-size:0.85em">❄️</div>
+    <div><h2 style="font-size:1.3em">热管理</h2><div class="subtitle">EREV · 比纯电多一路发动机余热</div></div>
+  </div>
+<div class="content-card"><h3>❄️ 热管理系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">热泵空调</div><div class="part-desc">与BEV相同，COP 2-4。</div></div>
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">增程器余热回收</div><div class="part-desc">热交换器将发动机冷却液余热（85°C）传给座舱暖风和电池预热回路。冬季开暖风几乎不额外耗电，是EREV续航优势。</div></div>
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">PTC辅助加热</div><div class="part-desc">极寒余热不足时补充。</div></div>
+<div class="part-item" style="border-left-color:#2e7d32"><div class="part-name" style="color:#2e7d32">三条液冷回路</div><div class="part-desc">①电池温控 ②电驱冷却 ③增程器冷却。三条回路通过多通阀可互通（增程器余热→电池预热）。</div></div>
+</div></div>
+</section>
+<section class="section" id="erev-chassis" data-type="erev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##2e7d32,##43a047);font-size:0.85em">🚘</div>
+    <div><h2 style="font-size:1.3em">制动底盘</h2><div class="subtitle">EREV · 与纯电BEV高度一致</div></div>
+  </div>
+<div class="content-card"><h3>🚘 制动/转向/底盘/车身</h3><p>制动系统（能量回收+机械制动协调）、转向系统（EPS）、底盘悬架、车身结构与纯电BEV基本相同。唯一额外部件是增程器区域的排气系统、碳罐（燃油蒸发控制）和发动机舱隔音。</p></div>
+<div class="tip-box"><div class="tip-title">💡 EREV的独特价值</div><p>日常用电（0.1元/km）+长途用油（无焦虑）。满油满电续航1000-1300km。增程器NVH和发电效率是核心技术壁垒。</p></div>
+</section>
+<div class="group-header group-header-phev" data-type="phev">⚡ 插电混动车（PHEV）</div>
+<section class="section" id="phev-overview" data-type="phev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##1565c0,##1e88e5);font-size:0.85em">⚡</div>
+    <div><h2 style="font-size:1.3em">架构总览</h2><div class="subtitle">PHEV · 油电双驱全工况最优</div></div>
+  </div>
+<div class="img-card"><img src="images/phev-overview.jpg" alt="插电混动动力架构 — 发动机和电机均可驱动车轮"><div class="img-caption">插电混动动力架构 — 发动机和电机均可驱动车轮</div></div>
+<div class="content-card"><h3>⚡ 插混核心架构</h3><p>PHEV同时拥有<strong>完整燃油动力链</strong>（发动机+变速箱）和<strong>完整电驱动链</strong>（电池+电机），两者可独立驱动也可协同。最"全能"也最复杂的动力架构。</p>
+    <div class="flow-box"><div class="flow-title">纯电模式</div><div class="flow-steps"><span class="flow-step">动力电池</span><span class="flow-arrow">→</span> <span class="flow-step">逆变器</span><span class="flow-arrow">→</span> <span class="flow-step">驱动电机</span><span class="flow-arrow">→</span> <span class="flow-step">减速器</span><span class="flow-arrow">→</span><span class="flow-step">车轮</span></div></div>
+    <div class="flow-box"><div class="flow-title">混动模式</div><div class="flow-steps"><span class="flow-step">发动机</span><span class="flow-arrow">→</span> <span class="flow-step">DHT耦合</span><span class="flow-arrow">→</span> <span class="flow-step">+驱动电机</span><span class="flow-arrow">→</span> <span class="flow-step">减速器</span><span class="flow-arrow">→</span><span class="flow-step">车轮</span></div></div>
+    <div class="flow-box"><div class="flow-title">发动机直驱</div><div class="flow-steps"><span class="flow-step">发动机</span><span class="flow-arrow">→</span> <span class="flow-step">DHT变速</span><span class="flow-arrow">→</span> <span class="flow-step">差速器</span><span class="flow-arrow">→</span> <span class="flow-step">半轴</span><span class="flow-arrow">→</span><span class="flow-step">车轮</span></div></div>
+    <p>代表车型：比亚迪DM-i/DM-p、吉利银河L系列、长城哈弗/魏牌混动。</p></div>
+<div class="img-card"><img src="images/phev-dmt-layout.jpg" alt="插混三种工作模式 — 纯电/混动/发动机直驱的能量流对比"><div class="img-caption">插混三种工作模式 — 纯电/混动/发动机直驱的能量流对比</div></div>
+</section>
+<section class="section" id="phev-dht" data-type="phev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##1565c0,##1e88e5);font-size:0.85em">🔩</div>
+    <div><h2 style="font-size:1.3em">DHT变速箱</h2><div class="subtitle">PHEV · 混动专用变速箱，核心技术壁垒</div></div>
+  </div>
+<div class="img-card"><img src="images/phev-dht.jpg" alt="DHT混动专用变速箱剖面 — 发动机与电机动力耦合核心"><div class="img-caption">DHT混动专用变速箱剖面 — 发动机与电机动力耦合核心</div></div>
+<div class="content-card"><h3>🔩 DHT零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">DHT壳体与齿轮组</div><div class="part-desc">铝合金壳体集成平行轴或行星齿轮组。比亚迪DM-i单挡（E-CVT），吉利雷神3挡DHT，长城柠檬2挡DHT。挡位越多直驱范围越宽。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">P1电机（发电机/ISG）</div><div class="part-desc">与发动机曲轴直连。启动发动机、发电、调节转速至最优区间。功率30-60kW。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">P3电机（驱动电机）</div><div class="part-desc">变速箱输出端驱动电机。功率100-200kW。纯电模式唯一驱动力，混动模式与发动机协同。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">离合器 Clutch</div><div class="part-desc">控制发动机是否与驱动轮机械连接。断开=纯电/串联，接合=并联/直驱。湿式多片为主流。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">动力耦合机构</div><div class="part-desc">合并P1和P3扭矩。行星齿轮式（丰田THS）vs 离合器式（比亚迪DM-i）。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">油冷/水冷系统</div><div class="part-desc">ATF喷淋冷却电机绕组和齿轮，水冷回路辅助散热。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">DHT控制单元 HCU</div><div class="part-desc">协调发动机、P1、P3和离合器。根据车速/油门/SOC自动切换纯电/串联/并联/直驱/回收模式。</div></div>
+</div></div>
+</section>
+<section class="section" id="phev-engine" data-type="phev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##1565c0,##1e88e5);font-size:0.85em">⚙️</div>
+    <div><h2 style="font-size:1.3em">发动机</h2><div class="subtitle">PHEV · 混动专用优化</div></div>
+  </div>
+<div class="content-card"><h3>⚙️ 发动机零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">发动机本体</div><div class="part-desc">1.5L-2.0L涡轮/自吸。比亚迪1.5L骁云NA（43%热效率），长城1.5T（38%），丰田2.5L NA（41%）。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">可变气门正时 VVT</div><div class="part-desc">进气门延迟关闭实现阿特金森循环，膨胀比>压缩比，热效率提升5-8%。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">冷却EGR</div><div class="part-desc">5-15%废气引回进气道，降低燃烧温度减少NOx，减少泵气损失。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">排气系统</div><div class="part-desc">排气歧管+三元催化器+消声器。因工况稳定，催化器可更小更高效。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">燃油系统</div><div class="part-desc">油箱40-60L，高压直喷或歧管喷射。发动机不总是运行，需碳罐收集蒸发油气。</div></div>
+</div></div>
+</section>
+<section class="section" id="phev-battery" data-type="phev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##1565c0,##1e88e5);font-size:0.85em">🔋</div>
+    <div><h2 style="font-size:1.3em">电池电驱</h2><div class="subtitle">PHEV · 电池与电机</div></div>
+  </div>
+<div class="content-card"><h3>🔋 电池与电驱动零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">动力电池</div><div class="part-desc">10-30kWh（比BEV小）。纯电续航60-200km。比亚迪刀片电池（LFP），部分支持快充。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">逆变器/MCU</div><div class="part-desc">电机控制器，DC→AC。集成在DHT壳体内。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">BMS</div><div class="part-desc">管理10-30kWh电池。SOC工作窗口20-80%，避免满充满放延长寿命。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">DC-DC转换器</div><div class="part-desc">高压→12V降压，供低压设备。</div></div>
+</div></div>
+</section>
+<section class="section" id="phev-brake" data-type="phev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##1565c0,##1e88e5);font-size:0.85em">🛑</div>
+    <div><h2 style="font-size:1.3em">制动系统</h2><div class="subtitle">PHEV · 双系统协调制动</div></div>
+  </div>
+<div class="content-card"><h3>🛑 制动系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">电子制动助力器</div><div class="part-desc">与BEV相同iBooster/eBooster，支持制动混合控制。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">能量回收制动</div><div class="part-desc">P3电机反转发电回收动能。回收功率受电池SOC限制。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">机械盘式制动</div><div class="part-desc">四轮液压盘式制动，ABS/ESC与BEV相同。</div></div>
+<div class="part-item" style="border-left-color:#1565c0"><div class="part-name" style="color:#1565c0">发动机辅助制动</div><div class="part-desc">串联模式下发动机拖拽制动力矩，减少机械制动磨损。</div></div>
+</div></div>
+</section>
+<section class="section" id="phev-other" data-type="phev"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##1565c0,##1e88e5);font-size:0.85em">❄️</div>
+    <div><h2 style="font-size:1.3em">热管理底盘</h2><div class="subtitle">PHEV · 三回路温控 + 底盘差异</div></div>
+  </div>
+<div class="content-card"><h3>❄️ 热管理/底盘/转向/车身</h3><p>热管理同时覆盖发动机冷却（90°C回路）、电驱冷却（60°C回路）和电池温控（30°C回路），以及座舱空调（压缩机+PTC+发动机余热）。复杂度最高但可利用发动机余热节能。底盘悬架/转向/车身与BEV类似，但因同时有发动机和电池，重量分布设计更具挑战。</p></div>
+<div class="tip-box"><div class="tip-title">💡 PHEV的核心优势</div><p>全工况效率最优：城市用电、高速用油直驱（无二次转换损耗）。</p></div>
+</section>
+<div class="group-header group-header-compare" data-type="compare">📊 四种动力架构对比</div>
+<div class="group-header group-header-compare" data-type="compare">📊 四种动力架构对比</div>
+<section class="section" id="compare" data-type="compare">
+<div class="section-header"><div class="section-num" style="background:linear-gradient(135deg,#e65100,#f57c00)">17</div><div><h2>四种动力架构全面对比<span class="section-badge badge-compare">核心对比</span></h2><div class="subtitle">ICE vs BEV vs EREV vs PHEV</div></div></div>
+<div class="img-card"><img src="images/compare-four-types.jpg" alt="三种新能源 vs 燃油动力架构能量流对比"><div class="img-caption">三种新能源 vs 燃油动力架构能量流对比</div></div>
+<div class="content-card" style="padding:0;overflow:hidden"><table class="compare-table"><thead><tr><th>对比维度</th><th><span class="tag-ice">燃油车 ICE</span></th><th><span class="tag-bev">纯电 BEV</span></th><th><span class="tag-erev">增程 EREV</span></th><th><span class="tag-phev">插混 PHEV</span></th></tr></thead><tbody>
+<tr><td>动力来源</td><td>汽油/柴油</td><td>纯电（电池）</td><td>电+油（发电）</td><td>电+油（双驱）</td></tr>
+<tr><td>发动机</td><td>✅ 主驱动</td><td>❌ 无</td><td>✅ 仅发电</td><td>✅ 驱动+发电</td></tr>
+<tr><td>变速箱</td><td>✅ 6-10挡</td><td>❌ 单级减速</td><td>❌ 单级减速</td><td>✅ DHT混动专用</td></tr>
+<tr><td>驱动电机</td><td>❌ 无</td><td>✅ 1-4个</td><td>✅ 1-2个</td><td>✅ 1-2个</td></tr>
+<tr><td>电池容量</td><td>12V小电池</td><td>50-120 kWh</td><td>30-45 kWh</td><td>10-30 kWh</td></tr>
+<tr><td>纯电续航</td><td>0 km</td><td>400-800 km</td><td>150-250 km</td><td>60-200 km</td></tr>
+<tr><td>综合续航</td><td>600-900 km</td><td>400-800 km</td><td>1000-1300 km</td><td>1000-1400 km</td></tr>
+<tr><td>充电需求</td><td>无需</td><td>必须</td><td>推荐（可纯油）</td><td>推荐（可纯油）</td></tr>
+<tr><td>排放</td><td>尾气排放</td><td>零排放</td><td>低排放</td><td>低排放</td></tr>
+<tr><td>保养复杂度</td><td>高</td><td>低</td><td>中</td><td>中高</td></tr>
+<tr><td>零部件数量</td><td>约30,000</td><td>约15,000</td><td>约18,000</td><td>约25,000</td></tr>
+<tr><td>每公里成本</td><td>0.5-0.8元</td><td>0.05-0.15元</td><td>0.1-0.5元</td><td>0.1-0.5元</td></tr>
+<tr><td>高速巡航效率</td><td>★★★★</td><td>★★★</td><td>★★★</td><td>★★★★★</td></tr>
+<tr><td>城市通勤效率</td><td>★★</td><td>★★★★★</td><td>★★★★★</td><td>★★★★</td></tr>
+<tr><td>代表车型</td><td>大众/丰田燃油版</td><td>特斯拉/小鹏/蔚来</td><td>理想/问界/深蓝</td><td>比亚迪DM-i/银河</td></tr>
+</tbody></table></div>
+<div class="tip-box"><div class="tip-title">💡 如何选择？</div><p><strong>选纯电：</strong>有家充，通勤为主，追求最低成本。<br><strong>选增程：</strong>充电一般，经常长途，不想续航焦虑。<br><strong>选插混：</strong>全工况最优效率，高速油耗敏感。<br><strong>选燃油：</strong>充电不便，预算有限，或追求成熟可靠。</p></div>
+</section>
+
+<div class="group-header group-header-bus" data-type="bus">🚌 纯电动客车</div>
+<section class="section" id="ebus-overview" data-type="bus"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##6a1b9a,##8e24aa);font-size:0.85em">🚌</div>
+    <div><h2 style="font-size:1.3em">总体特征</h2><div class="subtitle">电动客车 · 城市公交电动化主力</div></div>
+  </div>
+<div class="img-card"><img src="images/ebus-overview.jpg" alt="12米纯电动城市客车构造总览 — 车顶电池、低地板、气动门"><div class="img-caption">12米纯电动城市客车构造总览 — 车顶电池、低地板、气动门</div></div>
+<div class="content-card"><h3>🚌 电动客车总体特征</h3><p>电动客车因<strong>载客量大（60-100人）、车重高（12-18吨）、运营时间长（16-20h/天）</strong>的特点，在电池布置、驱动方式、悬架、制动等方面与乘用车有显著差异。中国城市公交电动化率已超<strong>80%</strong>。</p></div>
+</section>
+<section class="section" id="ebus-battery" data-type="bus"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##6a1b9a,##8e24aa);font-size:0.85em">🔋</div>
+    <div><h2 style="font-size:1.3em">动力电池</h2><div class="subtitle">电动客车 · 车顶大容量布置</div></div>
+  </div>
+<div class="content-card"><h3>🔋 动力电池系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">电池箱体（车顶安装）</div><div class="part-desc">多个独立电池箱分布在车顶前后。铝合金箱体+钢结构底座。IP67防水，顶部导流罩减小风阻。每个箱体可独立拆装。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">磷酸铁锂电芯 LFP</div><div class="part-desc">几乎全部采用LFP：热稳定性好（分解温度>270°C）、循环寿命长（4000-6000次）、成本低。客车对重量不敏感。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">电池管理系统 BMS</div><div class="part-desc">管理200-400kWh电池。遵循SAE J1939通信协议（商用车CAN标准）。支持主动均衡。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">液冷/风冷温控</div><div class="part-desc">车顶电池散热：①液冷板（主流）②强制风冷（成本低均匀性差）。需-20°C~55°C环境下维持电池25-35°C。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">高压连接器/快断器</div><div class="part-desc">车顶电池与车底高压设备通过高压线束连接。MSD手动维修断开装置安装在电池箱外部。</div></div>
+</div></div>
+</section>
+<section class="section" id="ebus-motor" data-type="bus"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##6a1b9a,##8e24aa);font-size:0.85em">⚡</div>
+    <div><h2 style="font-size:1.3em">电驱动</h2><div class="subtitle">电动客车 · 中央驱动 vs 轮毂电机</div></div>
+  </div>
+<div class="img-card"><img src="images/ebus-motor.jpg" alt="电动客车高压电气系统架构 — 高压配电、电机控制、辅助系统"><div class="img-caption">电动客车高压电气系统架构 — 高压配电、电机控制、辅助系统</div></div>
+<div class="content-card"><h3>⚡ 电驱动系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">中央驱动电机</div><div class="part-desc">安装在车架中部或后部，通过传动轴驱动后桥。永磁同步，功率150-250kW。成熟可靠，宇通/比亚迪/金龙主力方案。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">轮毂电机</div><div class="part-desc">安装在后轮轮毂内的低速大扭矩电机（外转子式）。省去传动轴/差速器/减速器，实现低地板（<350mm）。但簧下质量大、散热难。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">电机控制器/逆变器</div><div class="part-desc">大功率IGBT模块200kW+。安装在电控柜内，强制风冷或液冷。FOC矢量控制。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">后桥总成</div><div class="part-desc">中央驱动方案使用传统客车后桥（主减速器+差速器）。轮毂电机方案用独立悬架后桥。承载13吨级。</div></div>
+</div></div>
+</section>
+<section class="section" id="ebus-brake" data-type="bus"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##6a1b9a,##8e24aa);font-size:0.85em">🛑</div>
+    <div><h2 style="font-size:1.3em">气压制动</h2><div class="subtitle">电动客车 · 压缩空气制动 + 缓速器</div></div>
+  </div>
+<div class="img-card"><img src="images/ebus-air-brake.jpg" alt="电动客车气压制动系统 — 空压机、储气罐、制动气室、缓速器"><div class="img-caption">电动客车气压制动系统 — 空压机、储气罐、制动气室、缓速器</div></div>
+<div class="content-card"><h3>🛑 气压制动系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">电动空压机</div><div class="part-desc">独立电机（5-15kW）驱动螺杆/活塞式空压机。产生8-10bar压缩空气。替代皮带驱动空压机。带空气干燥器。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">储气罐（4-6个）</div><div class="part-desc">车架两侧铝合金气罐，总容积60-100L。分别供前制动/后制动/驻车/辅助设备。压力<6bar报警。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">制动阀/脚制动阀</div><div class="part-desc">踩踏板时按比例分配气压到前后制动气室。双回路设计：前/后独立。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">制动气室（膜片式）</div><div class="part-desc">压缩空气推动膜片→推杆→凸轮→制动蹄/盘。力量远大于液压。弹簧制动气室兼做驻车制动（断气刹）。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">制动盘/制动鼓</div><div class="part-desc">前轮盘式（散热好），后轮可选盘/鼓。客车制动盘更大更厚。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">电涡流缓速器</div><div class="part-desc">传动轴上电磁制动装置。定子通电产生旋转磁场，转子铜盘感应涡流产生500-2000Nm制动力矩。无磨损、适合频繁停车公交工况。可回收能量。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">ABS/ASR模块</div><div class="part-desc">防抱死+驱动防滑。每轮独立调节气压。符合GB 12676标准。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">能量回收制动</div><div class="part-desc">驱动电机反转发电回收动能。与气压制动协调：轻刹优先回收，重刹叠加气压。回收功率可达100kW+。</div></div>
+</div></div>
+</section>
+<section class="section" id="ebus-suspension" data-type="bus"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##6a1b9a,##8e24aa);font-size:0.85em">🏗️</div>
+    <div><h2 style="font-size:1.3em">空气悬架</h2><div class="subtitle">电动客车 · 低地板与舒适性关键</div></div>
+  </div>
+<div class="img-card"><img src="images/ebus-suspension.jpg" alt="电动客车底盘结构 — 空气悬架、气制动、电涡流缓速器"><div class="img-caption">电动客车底盘结构 — 空气悬架、气制动、电涡流缓速器</div></div>
+<div class="content-card"><h3>🏗️ 空气悬架系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">空气弹簧（气囊）</div><div class="part-desc">橡胶+帘布层充气弹簧。充气承载车重，调气压即调刚度。行程200-250mm。前桥2个，后桥4个。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">ECAS电子控制单元</div><div class="part-desc">根据高度传感器自动充放气调车身高度。支持kneeling：到站时右侧降80mm方便上车。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">高度传感器</div><div class="part-desc">每个气囊位置一个，实时检测车身与车桥间距。ECAS据4个高度值计算调节各气囊压力。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">减震器</div><div class="part-desc">与空气弹簧并联的液压减震器。比乘用车大3-5倍。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">稳定杆</div><div class="part-desc">横向扭力杆抑制侧倾。客车重心高（3m+），刚度要求远大于乘用车。</div></div>
+</div></div>
+</section>
+<section class="section" id="ebus-electrical" data-type="bus"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##6a1b9a,##8e24aa);font-size:0.85em">⚡</div>
+    <div><h2 style="font-size:1.3em">高压电气</h2><div class="subtitle">电动客车 · PDU/DC-DC/空调/VCU</div></div>
+  </div>
+<div class="content-card"><h3>⚡ 高压电气与辅助系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">高压配电盒 PDU</div><div class="part-desc">分配高压电能到电机控制器/DC-DC/空调/空压机/PTC。内置接触器/熔断器/绝缘监测。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">DC-DC变换器</div><div class="part-desc">高压（500-750V）→24V低压（客车24V系统，非乘用车12V）。功率5-10kW。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">低压蓄电池（24V）</div><div class="part-desc">两组12V铅酸串联=24V。唯一启动电源，给VCU/BMS/仪表上电后闭合高压接触器。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">电动空调压缩机</div><div class="part-desc">高压涡旋压缩机10-20kW。客舱30-40m³，制冷量20-40kW。车顶冷凝器+蒸发器。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">大功率PTC暖风</div><div class="part-desc">15-30kW（家用空调5-10倍）。部分车型用热泵+PTC辅助。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">CAN整车控制器 VCU</div><div class="part-desc">协调BMS/MCU/空调/门控/制动等20+子系统。SAE J1939协议。支持GB/T 32960远程监控。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">电动助力转向 EHPS</div><div class="part-desc">电动泵液压助力3-5kW。客车方向盘助力需求极大（前轴载荷6吨+）。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">气动门系统</div><div class="part-desc">压缩空气驱动乘客门。气压6-8bar，开关门2-3秒。安全边条+防夹传感器。</div></div>
+</div></div>
+</section>
+<section class="section" id="ebus-charge" data-type="bus"><div class="section-header">
+    <div class="section-num" style="background:linear-gradient(135deg,##6a1b9a,##8e24aa);font-size:0.85em">🔌</div>
+    <div><h2 style="font-size:1.3em">充电系统</h2><div class="subtitle">电动客车 · 快充/受电弓/换电</div></div>
+  </div>
+<div class="content-card"><h3>🔌 充电系统零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">快充（CCS/GB/T）</div><div class="part-desc">双枪200-300kW，2-3小时充满。夜间场站集中充电为主。首末站间歇机会充电15-20分钟补50%。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">受电弓充电</div><div class="part-desc">车顶升起受电弓与站台充电轨对接，600A+自动充电。无需人工插拔，适合高频短线路。</div></div>
+<div class="part-item" style="border-left-color:#6a1b9a"><div class="part-name" style="color:#6a1b9a">换电模式</div><div class="part-desc">电池箱整体更换3-5分钟。需标准化接口和换电站。</div></div>
+</div></div>
+<div class="tip-box"><div class="tip-title">💡 电动客车的运营经济性</div><p>购车成本是柴油车1.5-2倍，但每公里能源成本仅0.8-1.2元（柴油3-4元），保养降低50%+。8年TCO比柴油车低20-30%。</p></div>
+</section>
+
+<div class="group-header group-header-mfg" data-type="mfg">🏭 汽车四大制造工艺</div>
+<section class="section" id="mfg-overview" data-type="mfg"><div class="section-header"><div class="section-num" style="background:linear-gradient(135deg,#37474f,#546e7a);font-size:0.85em">🏭</div><div><h2 style="font-size:1.3em">四大工艺总览</h2><div class="subtitle">汽车制造 · 从钢板到整车的完整流程</div></div></div>
+<div class="img-card"><img src="images/mfg-overview.jpg" alt="汽车制造四大工艺流程 — 冲压→焊装→涂装→总装"><div class="img-caption">汽车制造四大工艺流程 — 冲压→焊装→涂装→总装</div></div>
+<div class="content-card"><h3>🏭 汽车制造四大工艺概述</h3><p>一辆汽车从钢板到下线出厂，需要经过<strong>四大核心工艺</strong>：冲压（Stamping）→ 焊装（Welding）→ 涂装（Painting）→ 总装（Final Assembly）。全球汽车行业百年形成的标准制造流程，无论燃油车还是新能源车，车身制造都遵循此路径。</p><p>现代汽车工厂占地 <strong>20-50万m²</strong>，投资 <strong>30-100亿元</strong>，年产能 <strong>10-30万辆</strong>。焊装车间机器人密度可达1000+台/万辆，涂装自动化率>95%。</p><div class="flow-box"><div class="flow-title">四大工艺流程</div><div class="flow-steps"><span class="flow-step">冲压 Stamping</span><span class="flow-arrow">→</span><span class="flow-step">焊装 Welding</span><span class="flow-arrow">→</span><span class="flow-step">涂装 Painting</span><span class="flow-arrow">→</span><span class="flow-step">总装 Assembly</span><span class="flow-arrow">→</span><span class="flow-step">检测 PDI</span><span class="flow-arrow">→</span><span class="flow-step">下线交付</span></div></div></div>
+</section>
+<section class="section" id="mfg-stamping" data-type="mfg"><div class="section-header"><div class="section-num" style="background:linear-gradient(135deg,#37474f,#546e7a);font-size:0.85em">🔨</div><div><h2 style="font-size:1.3em">冲压工艺</h2><div class="subtitle">汽车制造 · 从钢卷到车身覆盖件</div></div></div>
+<div class="img-card"><img src="images/mfg-stamping.jpg" alt="冲压工艺 — 钢卷开卷→冲压成形→质检"><div class="img-caption">冲压工艺 — 钢卷开卷→冲压成形→质检</div></div>
+<div class="content-card"><h3>🔨 冲压车间设备与零部件</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">钢卷 Steel Coil</div><div class="part-desc">原材料。冷轧/镀锌钢板，厚度0.7-2.0mm，宽1000-2000mm，每卷10-25吨。高强度钢（DP/TRIP）用于安全件。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">开卷落料线 Blanking Line</div><div class="part-desc">钢卷展开、矫平、裁剪成坯料。激光落料或模具冲裁，精度±0.5mm。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">大型冲压线 Press Line</div><div class="part-desc">伺服/液压冲床2000-6000吨级，4-6台串联。每分钟冲压12-18件（SPM）。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">模具 Die</div><div class="part-desc">上模（凸模）+下模（凹模）。模具钢D2/SKD11加工精度±0.02mm。一套寿命50-100万件。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">冲压件 Stamped Parts</div><div class="part-desc">覆盖件（引擎盖/翼子板/车门/侧围/顶盖）和结构件（纵梁/地板）。A级曲面Ra<0.4μm。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">在线质检</div><div class="part-desc">蓝光扫描/三坐标CMM，尺寸偏差±0.3mm。表面缺陷AI视觉+人工检测。</div></div>
+</div></div>
+<div class="tip-box"><div class="tip-title">💡 冲压趋势</div><p>热成形钢（1500-2000MPa）用于A/B柱/门槛梁，保证安全同时减重30-40%。一体化压铸（Gigacasting）用6000吨压铸机一体成形后地板，替代70+冲压件和1600+焊点。</p></div>
+</section>
+<section class="section" id="mfg-welding" data-type="mfg"><div class="section-header"><div class="section-num" style="background:linear-gradient(135deg,#37474f,#546e7a);font-size:0.85em">🤖</div><div><h2 style="font-size:1.3em">焊装工艺</h2><div class="subtitle">汽车制造 · 白车身（BIW）的诞生</div></div></div>
+<div class="img-card"><img src="images/mfg-welding.jpg" alt="焊装车间 — 点焊机器人将冲压件拼焊成白车身"><div class="img-caption">焊装车间 — 点焊机器人将冲压件拼焊成白车身</div></div>
+<div class="content-card"><h3>🤖 焊装车间工艺与设备</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">白车身 BIW</div><div class="part-desc">Body In White。300-500个冲压件通过4000-6000个焊点+胶接+铆接组合。重量占整车25-30%。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">点焊 Spot Welding</div><div class="part-desc">最核心连接方式（占80%+）。电极加压+通电，接触面金属熔化形成焊核。每个焊点0.3-0.5秒。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">激光焊 Laser Welding</div><div class="part-desc">用于顶盖与侧围长焊缝。焊接速度6m/min，热影响区小。远程激光焊可达10m/min。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">涂胶 Adhesive Bonding</div><div class="part-desc">结构胶（环氧/聚氨酯）增加刚度和密封。折边胶用于门盖包边。减震胶降低钣金共振。单车用量15-25kg。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">SPR/FDS铆接</div><div class="part-desc">自冲铆接和热熔钻孔螺钉，用于铝-钢/铝-铝异材连接。新能源车铝车身用量增加。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">夹具 Fixture</div><div class="part-desc">精确定位各冲压件。Geo-station保证关键尺寸（Gap&Flush），NC locator精度±0.1mm。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">总拼工位 Main Assembly</div><div class="part-desc">地板+左右侧围+顶盖+前后围合拼成完整BIW。6-8台机器人协同，精度±0.5mm。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">在线测量</div><div class="part-desc">Perceptron/Hexagon激光测量，每车身200-500个点，实时反馈MES。</div></div>
+</div></div>
+</section>
+<section class="section" id="mfg-painting" data-type="mfg"><div class="section-header"><div class="section-num" style="background:linear-gradient(135deg,#37474f,#546e7a);font-size:0.85em">🎨</div><div><h2 style="font-size:1.3em">涂装工艺</h2><div class="subtitle">汽车制造 · 防腐+美观+品质感</div></div></div>
+<div class="img-card"><img src="images/mfg-painting.jpg" alt="涂装工艺流程 — 前处理→电泳→中涂→色漆→清漆→烘干"><div class="img-caption">涂装工艺流程 — 前处理→电泳→中涂→色漆→清漆→烘干</div></div>
+<div class="content-card"><h3>🎨 涂装车间工艺流程</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">前处理 Pretreatment</div><div class="part-desc">脱脂→水洗→表调→磷化→纯水洗。形成磷酸锌转化膜（2-4g/m²）增强附着力和防腐性。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">电泳 E-Coat</div><div class="part-desc">阴极电泳。白车身浸入电泳槽，漆膜均匀沉积所有表面（含内腔）。膜厚15-25μm。防腐保证10年不锈穿。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">中涂 Primer</div><div class="part-desc">膜厚25-35μm，提高面漆附着力、平整度和抗石击性。B1B2/3-Wet新工艺可取消中涂。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">色漆 Base Coat</div><div class="part-desc">决定颜色的面漆层（12-18μm）。水性漆VOC<200g/m²。金属漆含铝粉，珠光漆含云母片。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">清漆 Clear Coat</div><div class="part-desc">最外层透明保护漆（35-45μm）。光泽度>90 GU@60°，耐UV耐划伤。双组分聚氨酯为主流。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">烘干炉 Oven</div><div class="part-desc">各涂层间和最终烘干。140-180°C，20-30分钟。漆膜充分交联固化。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">喷漆机器人</div><div class="part-desc">ABB/Dürr/Fanuc六轴机器人+旋杯雾化器（30000-60000rpm）。换色<10秒。膜厚精度±2μm。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">无尘车间</div><div class="part-desc">洁净度10万级（ISO 8）。正压通风+人员风淋+空气过滤。</div></div>
+</div></div>
+<div class="tip-box"><div class="tip-title">💡 涂装趋势</div><p>紧凑型工艺（B1B2/3-Wet）取消中涂烘干节能30%。双色车身需精准遮蔽或数字喷墨技术。</p></div>
+</section>
+<section class="section" id="mfg-assembly" data-type="mfg"><div class="section-header"><div class="section-num" style="background:linear-gradient(135deg,#37474f,#546e7a);font-size:0.85em">🔧</div><div><h2 style="font-size:1.3em">总装工艺</h2><div class="subtitle">汽车制造 · 零部件到整车的最终集成</div></div></div>
+<div class="img-card"><img src="images/mfg-assembly.jpg" alt="总装车间 — 内饰线/底盘线/最终线的三线合一"><div class="img-caption">总装车间 — 内饰线/底盘线/最终线的三线合一</div></div>
+<div class="content-card"><h3>🔧 总装车间工艺与工位</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">内饰线 Interior Line</div><div class="part-desc">安装线束、仪表板、空调管路、隔音棉、顶棚、地毯、座椅骨架。占装配工作量40%。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">底盘线 Chassis Line</div><div class="part-desc">安装动力总成（发动机/电机+变速箱合装）、悬架、排气管、油箱/电池包、制动管路。"合装（Marriage）"是核心工位。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">最终线 Final Line</div><div class="part-desc">安装车门、保险杠、灯具、挡风玻璃（涂胶+机器人安装）、轮胎、方向盘、加注液体。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">力矩控制</div><div class="part-desc">所有关键螺栓用电动拧紧枪（Atlas Copco/Bosch），实时记录扭矩+角度数据。上传MES保存15年可追溯。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">加注系统</div><div class="part-desc">自动定量加注：制动液DOT4、冷却液、冷媒R134a/R1234yf、洗涤液、机油。真空加注确保无气泡。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">下线检测 EOL</div><div class="part-desc">四轮定位、灯光检测、制动测试（转鼓/平板）、ADAS标定、气密性（雨淋测试）、OBD诊断。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">PDI/路试</div><div class="part-desc">Pre-Delivery Inspection。抽检路试（跑道/高速环道），检查异响、操控、制动主观品质。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">MES制造执行系统</div><div class="part-desc">实时追踪每辆车VIN码，协调2000+零部件JIT/JIS准时配送。Andon异常报警停线。</div></div>
+</div></div>
+<div class="content-card"><h3>🏭 新能源车总装差异</h3><div class="parts-grid">
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">电池包合装</div><div class="part-desc">电池包（500-800kg）从底部AGV举升合装。精确对位±1mm，16-24颗螺栓按规定顺序拧紧。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">高压线束安装</div><div class="part-desc">橙色高压线束（400/800V）走线固定，连接器"咔嗒"确认锁止。绝缘检测>500MΩ。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">电机+减速器合装</div><div class="part-desc">电驱动总成（电机+逆变器+减速器一体化）替代发动机+变速箱。重量150-250kg vs 300-500kg。</div></div>
+<div class="part-item" style="border-left-color:#37474f"><div class="part-name" style="color:#37474f">无排气/油箱工位</div><div class="part-desc">省去排气管和油箱安装。增加充电口安装和充电功能测试。</div></div>
+</div></div>
+<div class="tip-box"><div class="tip-title">💡 总装趋势</div><p>AGV/AMR无人搬运替代传统输送链实现柔性混产。数字孪生（Digital Twin）实时仿真优化产线节拍。AR辅助装配指导工人。</p></div>
+</section>
+</div><!-- end .main -->
+
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+  <p>汽车构造详解 | 图文教学版 | 燃油乘用车 + 新能源 + 电动客车 + 四大工艺 · 44个专题 · 235+零部件 · 32张高清图解</p>
+  <p style="margin-top: 6px; opacity: 0.6;">Generated by QoderWork · 2026</p>
+</div>
+
+<!-- ===== LIGHTBOX ===== -->
+<div class="lightbox" id="lightbox">
+  <div class="close-btn" onclick="closeLightbox()">&times;</div>
+  <img id="lightbox-img" src="" alt="放大查看">
+</div>
+
+<!-- ===== SCROLL TO TOP ===== -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// === Dynamic DOM queries (re-query each time, not cached) ===
+const qSections = () => document.querySelectorAll('.section');
+const qNavLinks = () => document.querySelectorAll('.nav a');
+const qGroupHeaders = () => document.querySelectorAll('.group-header');
+
+// === Lightbox ===
+document.addEventListener('click', e => {
+  const img = e.target.closest('.img-card img');
+  if (img) {
+    document.getElementById('lightbox-img').src = img.src;
+    document.getElementById('lightbox').classList.add('active');
+  }
+  if (e.target.closest('.lightbox .close-btn') || (e.target.classList.contains('lightbox') && !e.target.closest('img'))) {
+    document.getElementById('lightbox').classList.remove('active');
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('active');
+});
+
+// === Scroll to top ===
+const scrollBtn = document.getElementById('scrollTop');
+window.addEventListener('scroll', () => {
+  scrollBtn.classList.toggle('visible', window.scrollY > 400);
+}, { passive: true });
+scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+// === Type tab filtering ===
+const typeTabs = document.querySelectorAll('.type-tab');
+let currentFilter = 'all';
+
+function filterByType(type) {
+  currentFilter = type;
+  typeTabs.forEach(t => t.classList.toggle('active', t.dataset.filter === type));
+  qNavLinks().forEach(link => {
+    link.style.display = (type === 'all' || link.dataset.type === type) ? '' : 'none';
+  });
+  qSections().forEach(sec => {
+    sec.style.display = (type === 'all' || sec.dataset.type === type) ? '' : 'none';
+  });
+  qGroupHeaders().forEach(gh => {
+    gh.classList.toggle('visible', type === 'all' || gh.dataset.type === type);
+  });
+  const first = document.querySelector('.section:not([style*="display: none"])');
+  if (first && type !== 'all') {
+    setTimeout(() => first.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  if (type !== 'all') history.replaceState(null, '', '#type-' + type);
+}
+
+typeTabs.forEach(tab => tab.addEventListener('click', () => filterByType(tab.dataset.filter)));
+filterByType('all');
+
+// === Nav click: smooth scroll ===
+document.querySelector('.nav').addEventListener('click', e => {
+  const link = e.target.closest('a');
+  if (!link || !link.dataset.type) return;
+  e.preventDefault();
+  const targetType = link.dataset.type;
+  if (currentFilter !== 'all' && currentFilter !== targetType) filterByType(targetType);
+  const targetId = link.getAttribute('href').substring(1);
+  const target = document.getElementById(targetId);
+  if (target) {
+    target.style.display = '';
+    setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+  }
+});
+
+// === Scroll spy: active nav highlight ===
+const navObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      qNavLinks().forEach(l => l.classList.remove('active'));
+      const active = document.querySelector('.nav a[href="#' + entry.target.id + '"]');
+      if (active) {
+        active.classList.add('active');
+        active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+  });
+}, { rootMargin: '-100px 0px -60% 0px', threshold: 0.1 });
+qSections().forEach(s => navObs.observe(s));
+
+// === Handle URL hash on load ===
+if (location.hash) {
+  const h = location.hash.substring(1);
+  if (h.startsWith('type-')) {
+    filterByType(h.replace('type-', ''));
+  } else {
+    const el = document.getElementById(h);
+    if (el) {
+      if (el.dataset.type) filterByType(el.dataset.type);
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 200);
+    }
+  }
+}
+</script>
+
+</body>
+</html>
